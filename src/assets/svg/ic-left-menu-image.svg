@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="28px" height="28px" viewBox="0 0 28 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 56</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="弹窗" transform="translate(-225, -40)">
+            <g id="编组-56" transform="translate(225, 40)">
+                <rect id="矩形" fill="#FFFFFF" opacity="0.100000001" x="0" y="0" width="28" height="28" rx="2"></rect>
+                <g id="编组-55" transform="translate(3, 5)" stroke="#333333" stroke-linejoin="round" stroke-width="2">
+                    <path d="M0,1.125 C0,0.503679375 0.503679375,0 1.125,0 L20.25,0 C20.8713375,0 21.375,0.503679375 21.375,1.125 L21.375,16.875 C21.375,17.4963375 20.8713375,18 20.25,18 L1.125,18 C0.503679375,18 0,17.4963375 0,16.875 L0,1.125 Z" id="路径" stroke-linecap="round"></path>
+                    <path d="M5.34375,5.625 C5.809725,5.625 6.1875,5.247225 6.1875,4.78125 C6.1875,4.315275 5.809725,3.9375 5.34375,3.9375 C4.877775,3.9375 4.5,4.315275 4.5,4.78125 C4.5,5.247225 4.877775,5.625 5.34375,5.625 Z" id="路径" stroke-linecap="round"></path>
+                    <path d="M5.625,9 L8.4375,11.25 L11.8125,7.3125 L21.375,14.625 L21.375,16.875 C21.375,17.4963375 20.8713375,18 20.25,18 L1.125,18 C0.503679375,18 0,17.4963375 0,16.875 L0,14.625 L5.625,9 Z" id="路径"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

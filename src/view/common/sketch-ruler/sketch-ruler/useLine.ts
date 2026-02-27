@@ -1,0 +1,174 @@
+import {computed, ref} from 'vue'
+import type {LineType, PaletteType} from '../index-types'
+import {debounce, pxToMillimetre} from '../canvas-ruler/utils'
+
+interface Props {
+  palette: PaletteType
+  lockLine: boolean
+  scale: number
+  snapThreshold: number
+  snapsObj: LineType
+  lines: LineType
+  canvasHeight: number
+  canvasWidth: number
+  rate: number
+  index?: number
+  elemInfo: any
+}
+
+export default function useLine(props: Props, vertical: boolean) {
+  const offsetLine = ref(0)
+  const startValue = ref(0)
+  const showLabel = ref(false)
+
+  const canCursor = ref(true)
+  const actionStyle = computed(() => ({
+    backgroundColor: props.palette.hoverBg,
+    color: props.palette.hoverColor,
+    [vertical ? 'top' : 'left']: `-8px`,
+    [vertical ? 'left' : 'top']: `${offsetLine.value + 10}px`,
+  }))
+
+  const inputStyle = computed(() => ({
+    [vertical ? 'top' : 'left']: `-8px`,
+    [vertical ? 'left' : 'top']: `20px`,
+  }))
+
+  const handleMouseMove = ({offsetX, offsetY, clientX, clientY}: {offsetX: number; offsetY: number; clientX: number; clientY: number}) => {
+    const {left, top, width, height} = props.elemInfo
+    // offsetLine.value = vertical ? (clientX > left ? offsetX - width + left : offsetX) : clientY > top ? offsetY + height + top : offsetY
+    offsetLine.value = vertical ? offsetX : offsetY
+  }
+
+  const handleMouseDown = (e: MouseEvent, propValue?: number) => {
+    return new Promise<void>((resolve) => {
+      console.log('currentPosition', e.clientX, e.clientY)
+      // console.log('currentPosition', e.offsetX, e.offsetY)
+      // console.log('currentPosition', vertical)
+      // canCursor.value = false
+      // if (
+      //   props.elemInfo &&
+      //   ((vertical && e.clientX > props.elemInfo.left && e.clientX < props.elemInfo.left + props.elemInfo.width) || (!vertical && e.clientY > props.elemInfo.top && e.clientY < props.elemInfo.top + props.elemInfo.height))
+      // ) {
+      //   return
+      // }
+      if (props.lockLine) return
+      const startPosition = vertical ? e.clientY : e.clientX
+      handleMouseMove(e)
+      const initialValue = propValue || startValue.value
+      let tempStartValue = initialValue
+      const moveHandler = (e: MouseEvent) => {
+        const currentPosition = vertical ? e.clientY : e.clientX
+        const delta = (currentPosition - startPosition) / props.scale
+        let nextPos = delta + initialValue
+        let guidePos = nextPos
+        const snaps = vertical ? props.snapsObj.h : props.snapsObj.v
+        const guideSnaps = snaps!.slice().sort((a: number, b: number) => {
+          return Math.abs(guidePos - a) - Math.abs(guidePos - b)
+        })
+        // 吸附效果跟scale有关, 缩放后吸附效果会变差,所以要除props.scale
+        if (guideSnaps.length && Math.abs(guideSnaps[0] - nextPos) < props.snapThreshold / props.scale) {
+          guidePos = guideSnaps[0]
+          nextPos = guidePos
+        }
+        tempStartValue = Math.round(nextPos)
+        startValue.value = tempStartValue
+      }
+      const mouseUpHandler = () => {
+        document.removeEventListener('mousemove', moveHandler)
+        handleLineRelease(tempStartValue, props.index)
+        resolve()
+      }
+      document.addEventListener('mousemove', moveHandler)
+      document.addEventListener('mouseup', mouseUpHandler, {once: true})
+    })
+  }
+
+  /**
+   * @description: 放开线条处理
+   * @param {*} value  距离边框的位置
+   * @param {*} index  选的哪条线
+   */
+  const handleLineRelease = (value: number, index?: number) => {
+    const linesArrs = vertical ? props.lines?.h : props.lines?.v
+    const isOutOfRange = checkBoundary(value)
+    if (!linesArrs) {
+      return
+    }
+    if (isOutOfRange) {
+      if (typeof index === 'number') {
+        linesArrs.splice(index, 1)
+      } else {
+        return // 新增越界,什么也不做
+      }
+    } else {
+      if (typeof index !== 'number') {
+        linesArrs.push(value)
+      } else {
+        linesArrs[index] = value
+      }
+    }
+  }
+
+  /**
+   * @desc:检查越界
+   * @param {number} value
+   */
+  const checkBoundary = (value: number) => {
+    const maxOffset = vertical ? props.canvasHeight : props.canvasWidth
+    return value < 0 || value > maxOffset
+  }
+
+  const labelContent = computed(() => {
+    if (checkBoundary(startValue.value)) return '放开删除'
+    const px2Mill = pxToMillimetre(startValue.value * props.rate)
+    return `${vertical ? 'Y' : 'X'}：${px2Mill}`
+  })
+
+  const debouncedHandleMouseLeave = debounce(() => {
+    showLabel.value = false
+    // canCursor.value = true
+  }, 200)
+
+  const debouncedHandleMouseEnter = debounce(() => {
+    showLabel.value = true
+  }, 200)
+
+  const handleMouseenter = (e: MouseEvent) => {
+    if (!props.lockLine) {
+      if (
+        !props.elemInfo ||
+        (vertical && e.clientX < props.elemInfo.left) ||
+        e.clientX > props.elemInfo.left + props.elemInfo.width ||
+        (!vertical && e.clientY < props.elemInfo.top) ||
+        e.clientY > props.elemInfo.top + props.elemInfo.height
+      ) {
+        // canCursor.value = true
+        handleMouseMove(e)
+        debouncedHandleMouseEnter()
+      } else {
+        // canCursor.value = false
+        // console.log('currentPosition', canCursor.value)
+        e.preventDefault()
+      }
+      debouncedHandleMouseLeave.cancel()
+    }
+  }
+
+  const handleMouseLeave = () => {
+    debouncedHandleMouseLeave()
+  }
+
+  return {
+    showLabel,
+    startValue,
+    actionStyle,
+    labelContent,
+    canCursor,
+    handleMouseDown,
+    handleMouseenter,
+    handleMouseLeave,
+    handleLineRelease,
+    inputStyle,
+  }
+}

@@ -1,0 +1,139 @@
+.es-drager {
+  --es-drager-color: #3a7afe;
+  box-sizing: border-box;
+  position: absolute;
+  //&::after {
+  //  content: '';
+  //  position: absolute;
+  //  top: 0;
+  //  left: 0;
+  //  width: 100%;
+  //  height: 100%;
+  //  display: none;
+  //}
+  &.selected {
+    transition: none;
+
+    .es-drager-dot {
+      display: block;
+      z-index: 9999;
+    }
+
+    .es-drager-borderCustom {
+      display: block;
+      z-index: 9998;
+    }
+
+    &.border {
+      outline: 1px dashed var(--es-drager-color);
+    }
+  }
+
+  &-borderCustom {
+    display: none;
+    z-index: 2;
+    position: absolute;
+
+    &[data-border='top'] {
+      cursor: n-resize;
+      height: 10px;
+      transform: translate(0, -10px);
+      width: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    &[data-border='bottom'] {
+      cursor: s-resize;
+      height: 10px;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      transform: translate(0, 10px);
+    }
+
+    &[data-border='left'] {
+      cursor: w-resize;
+      height: 100%;
+      width: 10px;
+      top: 0;
+      left: 0;
+      transform: translate(-10px, 0);
+    }
+
+    &[data-border='right'] {
+      cursor: e-resize;
+      height: 100%;
+      width: 10px;
+      top: 0;
+      right: 0;
+      transform: translate(10px, 0);
+    }
+  }
+
+  &.border {
+    border: 0 dashed var(--es-drager-color);
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed !important;
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    // 让子元素也继承小手光标
+    * {
+      cursor: pointer;
+    }
+  }
+
+  &-dot {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    box-sizing: border-box;
+    border: 10px solid transparent;
+    transform: translate(-50%, -50%);
+    cursor: se-resize;
+
+
+    &-handle {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--es-drager-color);
+      box-sizing: content-box;
+      border: 1px solid var(--es-drager-color);
+    }
+
+    &[data-side='left'], &[data-side='right'] {
+      .es-drager-dot-handle {
+        width: 8px;
+        height: 16px;
+        border-radius: 8px;
+      }
+    }
+
+    &[data-side='top'], &[data-side='bottom'] {
+      .es-drager-dot-handle {
+        width: 16px;
+        height: 8px;
+        border-radius: 8px;
+      }
+    }
+
+    &[data-side*='right'] {
+      transform: translate(50%, -50%);
+    }
+
+    &[data-side*='bottom'] {
+      transform: translate(-50%, 50%);
+    }
+
+    &[data-side='bottom-right'] {
+      transform: translate(50%, 50%);
+    }
+  }
+}

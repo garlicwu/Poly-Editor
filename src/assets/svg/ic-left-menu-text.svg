@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="28px" height="28px" viewBox="0 0 28 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 54</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="弹窗" transform="translate(-139, -40)">
+            <g id="编组-54" transform="translate(139, 40)">
+                <rect id="矩形" fill="#FFFFFF" opacity="0.100000001" x="0" y="0" width="28" height="28" rx="2"></rect>
+                <path d="M4,19 L4,22.3333333 C4,23.2538333 4.74619444,24 5.66666667,24 L9,24 M19,24 L22.3333333,24 C23.2538333,24 24,23.2538333 24,22.3333333 L24,19 M24,9 L24,5.66666667 C24,4.74619444 23.2538333,4 22.3333333,4 L19,4 M4,9 L4,5.66666667 C4,4.74619444 4.74619444,4 5.66666667,4 L9,4 M14,10.6666667 L14,20.1111111 M10.1111111,10.1111111 L14,10.1111111 L17.8888889,10.1111111" id="形状结合" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,454 @@
+
+.custom-header-1 {
+    font-size: 58px;
+    font-family: 'OPlusSans3-Bold', sans-serif;
+    text-transform: none;
+}
+
+.custom-header-2 {
+    font-size: 41px;
+    font-family: 'OPlusSans3-Bold', sans-serif;
+    text-transform: none;
+}
+
+.custom-list-ordered {
+    padding-left: 1.3em !important;
+    counter-set: list-0 1;
+    counter-increment: list-0;
+    counter-reset: list-1 list-2;
+
+    .ql-ui:before {
+        display: inline-block;
+        margin-left: -1.3em;
+        /* margin-right: .3em; */
+        text-align: right;
+        white-space: nowrap;
+        /* width: 0.8em; */
+    }
+
+    .ql-ui:before {
+        content: counter(list-0, decimal) '. ' !important;
+    }
+}
+
+.custom-list-ordered-1 {
+    padding-left: 1.3em !important;
+    counter-set: list-0 1;
+    counter-increment: list-0;
+    counter-reset: list-1 list-2;
+
+    .ql-ui:before {
+        display: inline-block;
+        margin-left: -1.3em !important;
+        /* margin-right: .3em; */
+        text-align: right;
+        white-space: nowrap;
+        /* width: 0.8em; */
+    }
+
+    .ql-ui:before {
+        content: counter(list-0, decimal) '. ' !important;
+    }
+}
+
+.custom-list-ordered-2 {
+    padding-left: 1.8em !important;
+    counter-set: list-0 1;
+    counter-increment: list-0;
+    counter-reset: list-1 list-2;
+
+    .ql-ui:before {
+        display: inline-block;
+        margin-left: -1.8em !important;
+        /*margin-right: 3.3em !important;*/
+        text-align: right;
+        white-space: nowrap;
+        /* width: 0.8em; */
+    }
+
+    .ql-ui:before {
+        content: counter(list-0, decimal) '. ' !important;
+    }
+}
+
+.custom-list-ordered-3 {
+    padding-left: 2.3em !important;
+    counter-set: list-0 1;
+    counter-increment: list-0;
+    counter-reset: list-1 list-2;
+
+    .ql-ui:before {
+        display: inline-block;
+        margin-left: -2.3em !important;
+        /* margin-right: .3em; */
+        text-align: right;
+        white-space: nowrap;
+        /* width: 0.8em; */
+    }
+
+    .ql-ui:before {
+        content: counter(list-0, decimal) '. ' !important;
+    }
+}
+
+/*.custom-list-ordered-circle-1-33 {*/
+/*    counter-set: list-0 1;*/
+/*    counter-increment: list-0;*/
+/*    counter-reset: list-1 list-2;*/
+/*    padding-left: 44px !important;*/
+/*}*/
+
+/*.custom-list-ordered-circle-1-33 .ql-ui:before {*/
+/*    font-size: 26px;*/
+/*    display: inline-block;*/
+/*    content: counter(list-0, decimal) '' !important;*/
+/*    margin-left: -44px !important;*/
+/*    width: 30px;*/
+/*    height: 30px !important;*/
+/*    border: 1px solid #000;*/
+/*    border-radius: 50%;*/
+/*    text-align: center !important;;*/
+/*    line-height: 30px;*/
+/*}*/
+
+
+.custom-list-bullet-1 {
+    padding-left: 1.3em !important;
+
+    .ql-ui:before {
+        display: inline-block;
+        margin-left: -1.5em !important;
+        margin-right: .3em;
+        text-align: right;
+        white-space: nowrap;
+        width: 1.2em;
+    }
+
+    .ql-ui:before {
+        content: '\2022' !important;
+    }
+}
+
+
+.custom-list-bullet-2 {
+    padding-left: 1.8em !important;
+
+    .ql-ui:before {
+        display: inline-block;
+        margin-left: -2em !important;
+        margin-right: .3em;
+        text-align: right;
+        white-space: nowrap;
+        width: 1.2em;
+    }
+
+    .ql-ui:before {
+        content: '\2022' !important;
+    }
+}
+
+.custom-list-bullet-3 {
+    padding-left: 2.3em !important;
+
+    .ql-ui:before {
+        display: inline-block;
+        margin-left: -2.5em !important;
+        margin-right: .3em;
+        text-align: right;
+        white-space: nowrap;
+        width: 1.2em;
+    }
+
+    .ql-ui:before {
+        content: '\2022' !important;
+    }
+}
+
+
+.ql-line-height-0 {
+    line-height: 0;
+}
+
+.ql-line-height-0-1 {
+    line-height: 0.1;
+}
+
+.ql-line-height-0-2 {
+    line-height: 0.2;
+}
+
+.ql-line-height-0-4 {
+    line-height: 0.4;
+}
+
+.ql-line-height-0-6 {
+    line-height: 0.6;
+}
+
+.ql-line-height-0-8 {
+    line-height: 0.8;
+}
+
+.ql-line-height-1-0 {
+    line-height: 1;
+}
+
+.ql-line-height-1-2 {
+    line-height: 1.2;
+}
+
+.ql-line-height-1-25 {
+    line-height: 1.25;
+}
+
+/*.ql-line-height-1-4 {*/
+/*    line-height: 1.4;*/
+/*}*/
+
+.ql-line-height-1-5 {
+    line-height: 1.5;
+}
+
+.ql-line-height-1-75 {
+    line-height: 1.75;
+}
+
+.ql-line-height-2-0 {
+    line-height: 2;
+}
+
+.ql-line-height-2-2 {
+    line-height: 2.2;
+}
+
+.ql-line-height-2-5 {
+    line-height: 2.5;
+}
+
+.ql-line-height-3-0 {
+    line-height: 3;
+}
+
+.ql-line-height-4-0 {
+    line-height: 4;
+}
+
+.ql-line-height-5-0 {
+    line-height: 5;
+}
+
+.term-custom-style-1 {
+    background: #3a7afe;
+}
+
+.term-custom-style-2 {
+
+}
+
+.ql-cs-letter-spacing-normal {
+    letter-spacing: normal;
+}
+
+.ql-cs-letter-spacing-0 {
+    letter-spacing: 0;
+}
+
+.ql-cs-letter-spacing-1 {
+    letter-spacing: 1px;
+}
+
+.ql-cs-letter-spacing-2 {
+    letter-spacing: 2px;
+}
+
+.ql-cs-letter-spacing-3 {
+    letter-spacing: 3px;
+}
+
+.ql-cs-letter-spacing-4 {
+    letter-spacing: 4px;
+}
+
+.ql-cs-letter-spacing-5 {
+    letter-spacing: 5px;
+}
+
+.ql-cs-letter-spacing-6 {
+    letter-spacing: 6px;
+}
+
+.ql-cs-letter-spacing-7 {
+    letter-spacing: 7px;
+}
+
+.ql-cs-letter-spacing-8 {
+    letter-spacing: 8px;
+}
+
+.ql-cs-letter-spacing-9 {
+    letter-spacing: 9px;
+}
+
+.ql-cs-letter-spacing-10 {
+    letter-spacing: 10px;
+}
+
+.ql-cs-letter-spacing-11 {
+    letter-spacing: 11px;
+}
+
+.ql-cs-letter-spacing-12 {
+    letter-spacing: 12px;
+}
+
+.ql-cs-letter-spacing-13 {
+    letter-spacing: 13px;
+}
+
+.ql-cs-letter-spacing-14 {
+    letter-spacing: 14px;
+}
+
+.ql-cs-letter-spacing-15 {
+    letter-spacing: 15px;
+}
+
+.ql-cs-letter-spacing-16 {
+    letter-spacing: 16px;
+}
+
+.ql-cs-letter-spacing-17 {
+    letter-spacing: 17px;
+}
+
+.ql-cs-letter-spacing-18 {
+    letter-spacing: 18px;
+}
+
+.ql-cs-letter-spacing-19 {
+    letter-spacing: 19px;
+}
+
+.ql-cs-letter-spacing-20 {
+    letter-spacing: 20px;
+}
+
+.ql-cs-letter-spacing-21 {
+    letter-spacing: 21px;
+}
+
+.ql-cs-letter-spacing-22 {
+    letter-spacing: 22px;
+}
+
+.ql-cs-letter-spacing-23 {
+    letter-spacing: 23px;
+}
+
+.ql-cs-letter-spacing-24 {
+    letter-spacing: 24px;
+}
+
+.ql-cs-letter-spacing-25 {
+    letter-spacing: 25px;
+}
+
+.ql-cs-letter-spacing-26 {
+    letter-spacing: 26px;
+}
+
+.ql-cs-letter-spacing-27 {
+    letter-spacing: 27px;
+}
+
+.ql-cs-letter-spacing-28 {
+    letter-spacing: 28px;
+}
+
+.ql-cs-letter-spacing-29 {
+    letter-spacing: 29px;
+}
+
+.ql-cs-letter-spacing-30 {
+    letter-spacing: 30px;
+}
+
+.ql-editor .ql-indent-1 {
+    padding-left: 1em;
+}
+
+.ql-editor .ql-indent-2 {
+    padding-left: 2em;
+}
+
+.ql-editor .ql-indent-3 {
+    padding-left: 3em;
+}
+
+.ql-editor .ql-indent-4 {
+    padding-left: 4em;
+}
+
+.ql-editor .ql-indent-5 {
+    padding-left: 5em;
+}
+
+.ql-editor .ql-indent-6 {
+    padding-left: 6em;
+}
+
+.ql-editor .ql-indent-7 {
+    padding-left: 7em;
+}
+
+.ql-editor .ql-indent-8 {
+    padding-left: 8em;
+}
+
+.ql-editor .ql-indent-9 {
+    padding-left: 9em;
+}
+
+.ql-editor .ql-indent-10 {
+    padding-left: 10em;
+}
+
+.ql-editor .ql-indent-11 {
+    padding-left: 11em;
+}
+
+.ql-editor .ql-indent-12 {
+    padding-left: 12em;
+}
+
+.ql-editor .ql-indent-13 {
+    padding-left: 13em;
+}
+
+.ql-editor .ql-indent-14 {
+    padding-left: 14em;
+}
+
+.ql-editor .ql-indent-15 {
+    padding-left: 15em;
+}
+
+.ql-editor .ql-indent-16 {
+    padding-left: 16em;
+}
+
+.ql-editor .ql-indent-17 {
+    padding-left: 17em;
+}
+
+.ql-editor .ql-indent-18 {
+    padding-left: 18em;
+}
+
+.ql-editor .ql-indent-19 {
+    padding-left: 19em;
+}
+
+.ql-editor .ql-indent-20 {
+    padding-left: 20em;
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>矩形备份 4</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="首页" transform="translate(-352, -18)">
+            <g id="编组-86" transform="translate(142, 14)">
+                <g id="编组-30" transform="translate(197, 0)">
+                    <g id="矩形备份-4" transform="translate(13, 4)">
+                        <rect id="矩形" fill="#F0F0F0" opacity="0" x="0" y="0" width="24" height="24"></rect>
+                        <g id="编组" transform="translate(5, 6)" stroke="#333333" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4">
+                            <polyline id="路径" points="2.624925 0 9.68921912e-16 2.25 2.624925 4.875"></polyline>
+                            <path d="M9.68921912e-16,2.25 L8.622675,2.25 C11.2038,2.25 13.3957875,4.35765 13.4964,6.9375 C13.6027125,9.6636 11.3501625,12 8.622675,12 L2.2494,12" id="路径"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

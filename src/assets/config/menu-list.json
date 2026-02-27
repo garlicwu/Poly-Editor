@@ -1,0 +1,17 @@
+[
+  {
+    "icon": "MaterialSymbolsEditCalendarRounded",
+    "title": "编辑",
+    "component": "design"
+  },
+  {
+    "icon": "RivetIconsData",
+    "title": "数据",
+    "component": "data"
+  },
+  {
+    "icon": "MaterialSymbolsLightMenu",
+    "title": "管理",
+    "component": "manager"
+  }
+]

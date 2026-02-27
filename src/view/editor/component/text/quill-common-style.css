@@ -1,0 +1,50 @@
+@import "quil-base-style.css";
+
+/* 确保所有状态下 ql-editor 都没有 padding */
+.ql-editor {
+    padding: 0 !important;
+    height: auto !important;
+    flex-shrink: 0;
+}
+
+.ql-container.ql-disabled .ql-editor {
+    padding: 0 !important;
+}
+
+/* 覆盖 Quill 默认的列表 padding */
+.ql-editor ol,
+.ql-editor ul {
+    padding-left: 0 !important;
+    margin: 0 !important;
+}
+
+.ql-container {
+    font-size: 29px;
+    padding: 0 !important;
+    font-family: Arial, sans-serif;
+    color: #000000;
+
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    .ql-editor {
+        padding: 0 !important;
+        caret-color: #000000 !important;
+        color: #000000 !important;
+        caret-width: 4px;
+        caret-shape: block;
+
+        &:focus-within {
+            caret-color: #000000 !important;
+            caret-width: 4px;
+        }
+    }
+
+    ol {
+        padding-left: 0;
+    }
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="28px" height="28px" viewBox="0 0 28 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 58</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="弹窗" transform="translate(-397, -40)">
+            <g id="编组-58" transform="translate(397, 40)">
+                <rect id="矩形" fill="#FFFFFF" opacity="0.100000001" x="0" y="0" width="28" height="28" rx="2"></rect>
+                <g id="编组-57" transform="translate(4, 4)" stroke="#333333" stroke-linejoin="round" stroke-width="2">
+                    <polygon id="路径" points="9.74358974 0 0 0 0 11.2820513 9.74358974 11.2820513"></polygon>
+                    <polygon id="路径" points="20.5128205 15.3846154 0 15.3846154 0 20 20.5128205 20"></polygon>
+                    <polygon id="路径" points="20.5128205 0 13.8461538 0 13.8461538 4.1025641 20.5128205 4.1025641"></polygon>
+                    <polygon id="路径" points="20.5128205 7.17948718 13.8461538 7.17948718 13.8461538 11.2820513 20.5128205 11.2820513"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

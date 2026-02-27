@@ -1,0 +1,70 @@
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@config "../../tailwind.config.js";
+@layer tailwind-base, primevue, tailwind-utilities;
+
+@layer tailwind-base {
+    @tailwind base;
+}
+
+@layer tailwind-utilities {
+    @tailwind components;
+    @tailwind utilities;
+}
+
+@theme {
+    --color-ppt-text-normal: #666666;
+    --color-ppt-text-light: #999999;
+    --color-ppt-text-dark: #333333;
+    --color-ppt-text-orange: #9333EA;
+    --color-ppt-bg-orange: #FFF2E6;
+    --color-ppt-text-purple: #9333EA;
+    --color-ppt-bg-purple: #F5F3FF;
+    --color-ppt-border-purple: #E9D5FF;
+    --color-ppt-line: #E9D5FF;
+    --color-ppt-bg-normal: #F5F3FF;
+    --color-ppt-page-border: #E9D5FF;
+    --color-ppt-btn-bg: #F3E8FF;
+    --color-ppt-text-border-line: #E9D5FF;
+}
+
+@layer components {
+    .left-card {
+        @apply text-ppt-text-normal text-xs cursor-pointer flex flex-col w-13.5 h-13.5 items-center justify-center rounded-md  mt-4 mb-3 ;
+        /*color: var(--color-ppt-text-normal);*/
+        /* font-size: 12px;*/
+
+        .left-svg {
+
+        }
+
+        &:hover {
+            @apply text-ppt-text-purple bg-ppt-bg-purple;
+
+            .left-svg {
+                color: var(--color-ppt-text-purple);
+                fill: var(--color-ppt-text-purple);
+            }
+        }
+
+        &.select {
+            @apply text-ppt-text-purple bg-ppt-bg-purple;
+
+            .left-svg {
+                color: var(--color-ppt-text-purple);
+                fill: var(--color-ppt-text-purple);
+            }
+        }
+
+    }
+}
+
+@layer primevue {
+    .p-dropdown-trigger-icon,
+    .p-select-dropdown-icon {
+        color: #9333EA !important;
+    }
+}
+

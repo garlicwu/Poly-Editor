@@ -1,0 +1,266 @@
+[
+  {
+    "type": "Yaber目录标题",
+    "lang": "英/西/法/德/意/芬兰/捷克/丹麦/印尼/挪威/波兰/葡萄牙/瑞典/土耳其/",
+    "size": 18,
+    "font": "Poppins-Regular"
+  },
+  {
+    "type": "Yaber目录",
+    "lang": "英/西/法/德/意/芬兰/捷克/丹麦/印尼/挪威/波兰/葡萄牙/瑞典/土耳其/",
+    "size": 10,
+    "font": "Poppins-Regular"
+  },
+  {
+    "type": "Yaber一级标题",
+    "lang": "英/西/法/德/意/芬兰/捷克/丹麦/印尼/挪威/波兰/葡萄牙/瑞典/土耳其/",
+    "size": 14,
+    "font": "Poppins-Regular"
+  },
+  {
+    "type": "Yaber二级标题",
+    "lang": "英/西/法/德/意/芬兰/捷克/丹麦/印尼/挪威/波兰/葡萄牙/瑞典/土耳其/",
+    "size": 10,
+    "font": "Poppins-Regular"
+  },
+  {
+    "type": "Yaber正文",
+    "lang": "英/西/法/德/意/芬兰/捷克/丹麦/印尼/挪威/波兰/葡萄牙/瑞典/土耳其/",
+    "size": 7,
+    "font": "Poppins-Regular"
+  },
+  {
+    "type": "Yaber备注文字",
+    "lang": "英/西/法/德/意/芬兰/捷克/丹麦/印尼/挪威/波兰/葡萄牙/瑞典/土耳其/",
+    "size": 5,
+    "font": "Poppins-Regular"
+  },
+  {
+    "type": "Yaber目录标题",
+    "lang": "日文",
+    "size": 14,
+    "font": "Future-Circle-Regular"
+  },
+  {
+    "type": "Yaber目录",
+    "lang": "日文",
+    "size": 10,
+    "font": "Future-Circle-Regular"
+  },
+  {
+    "type": "Yaber一级标题",
+    "lang": "日文",
+    "size": 14,
+    "font": "Future-Circle-Regular"
+  },
+  {
+    "type": "Yaber二级标题",
+    "lang": "日文",
+    "size": 10,
+    "font": "Future-Circle-Regular"
+  },
+  {
+    "type": "Yaber正文",
+    "lang": "日文",
+    "size": 8,
+    "font": "Future-Circle-Regular"
+  },
+  {
+    "type": "Yaber备注文字",
+    "lang": "日文",
+    "size": 5,
+    "font": "Future-Circle-Regular"
+  },
+  {
+    "type": "Yaber目录标题",
+    "lang": "俄文/阿拉伯文",
+    "size": 14,
+    "font": "Arialr"
+  },
+  {
+    "type": "Yaber目录",
+    "lang": "俄文/阿拉伯文",
+    "size": 10,
+    "font": "Arial"
+  },
+  {
+    "type": "Yaber一级标题",
+    "lang": "俄文/阿拉伯文",
+    "size": 14,
+    "font": "Arial"
+  },
+  {
+    "type": "Yaber二级标题",
+    "lang": "俄文/阿拉伯文",
+    "size": 10,
+    "font": "Arial"
+  },
+  {
+    "type": "Yaber正文",
+    "lang": "俄文/阿拉伯文",
+    "size": 8,
+    "font": "Arial"
+  },
+  {
+    "type": "Yaber备注文字",
+    "lang": "俄文/阿拉伯文",
+    "size": 5,
+    "font": "Arial"
+  },
+  {
+    "type": "Yaber目录标题",
+    "lang": "泰文/越南",
+    "size": 18,
+    "font": "NotoSansDevanagari-Regular"
+  },
+  {
+    "type": "Yaber目录",
+    "lang": "泰文/越南",
+    "size": 10,
+    "font": "NotoSansDevanagari-Regular"
+  },
+  {
+    "type": "Yaber目录(小)",
+    "lang": "泰文/越南",
+    "size": 8,
+    "font": "NotoSansDevanagari-Regular"
+  },
+  {
+    "type": "Yaber一级标题",
+    "lang": "泰文/越南",
+    "size": 14,
+    "font": "NotoSansDevanagari-Regular"
+  },
+  {
+    "type": "Yaber二级标题",
+    "lang": "泰文/越南",
+    "size": 10,
+    "font": "NotoSansDevanagari-Regular"
+  },
+  {
+    "type": "Yaber正文",
+    "lang": "泰文/越南",
+    "size": 7,
+    "font": "NotoSansDevanagari-Regular"
+  },
+  {
+    "type": "Yaber备注文字",
+    "lang": "泰文/越南",
+    "size": 5,
+    "font": "NotoSansDevanagari-Regular"
+  },
+  {
+    "type": "Yaber目录标题",
+    "lang": "中文",
+    "size": 18,
+    "font": "OPlusSans3-Regular"
+  },
+  {
+    "type": "Yaber目录",
+    "lang": "中文",
+    "size": 10,
+    "font": "OPlusSans3-Regular"
+  },
+  {
+    "type": "Yaber一级标题",
+    "lang": "中文",
+    "size": 14,
+    "font": "OPlusSans3-Regular"
+  },
+  {
+    "type": "Yaber二级标题",
+    "lang": "中文",
+    "size": 10,
+    "font": "OPlusSans3-Regular"
+  },
+  {
+    "type": "Yaber正文",
+    "lang": "中文",
+    "size": 7,
+    "font": "OPlusSans3-Regular"
+  },
+  {
+    "type": "Yaber备注文字",
+    "lang": "中文",
+    "size": 5,
+    "font": "OPlusSans3-Regular"
+  },
+  {
+    "type": "Yaber目标标题",
+    "lang": "韩文",
+    "size": 18,
+    "font": "SourceHanSans-Regular"
+  },
+  {
+    "type": "Yaber目录",
+    "lang": "韩文",
+    "size": 10,
+    "font": "SourceHanSans-Regular"
+  },
+  {
+    "type": "Yaber一级标题",
+    "lang": "韩文",
+    "size": 14,
+    "font": "SourceHanSans-Regular"
+  },
+  {
+    "type": "Yaber二级标题",
+    "lang": "韩文",
+    "size": 10,
+    "font": "SourceHanSans-Regular"
+  },
+  {
+    "type": "Yaber正文",
+    "lang": "韩文",
+    "size": 7,
+    "font": "SourceHanSans-Regular"
+  },
+  {
+    "type": "Yaber备注文字",
+    "lang": "韩文",
+    "size": 5,
+    "font": "SourceHanSans-Regular"
+  },
+  {
+    "type": "Airzeen目录标题",
+    "lang": "英/德/法/西/意",
+    "size": 14,
+    "font": "思源黑体"
+  },
+  {
+    "type": "Airzeen目录",
+    "lang": "英/德/法/西/意",
+    "size": 10,
+    "font": "思源黑体"
+  },
+  {
+    "type": "Airzeen一级标题",
+    "lang": "英/德/法/西/意",
+    "size": 14,
+    "font": "思源黑体"
+  },
+  {
+    "type": "Airzeen二级标题",
+    "lang": "英/德/法/西/意",
+    "size": 11,
+    "font": "思源黑体"
+  },
+  {
+    "type": "Airzeen三级标题",
+    "lang": "英/德/法/西/意",
+    "size": 9,
+    "font": "思源黑体"
+  },
+  {
+    "type": "Airzeen正文",
+    "lang": "英/德/法/西/意",
+    "size": 8,
+    "font": "思源黑体"
+  },
+  {
+    "type": "Airzeen表格正文",
+    "lang": "英/德/法/西/意",
+    "size": 7,
+    "font": "思源黑体"
+  }
+]
