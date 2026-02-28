@@ -2,6 +2,8 @@
 
 <div align="center">
 
+[English](./README.en.md) | 简体中文
+
 一个现代化的开源可视化编辑器，基于 Vue 3 + TypeScript 构建
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -10,6 +12,7 @@
 
 [在线演示](http://demo.jhu-ai.com/) | [快速开始](#-快速开始) | [文档](#-使用说明) | [贡献指南](CONTRIBUTING.md)
 
+**GitHub**: [https://github.com/garlicwu/polyeditor](https://github.com/garlicwu/polyeditor)
 **Gitee**: [https://gitee.com/wu_fan_xin/polyeditor](https://gitee.com/wu_fan_xin/polyeditor)
 
 </div>
@@ -90,11 +93,11 @@ Poly Editor 是一个功能完整的可视化编辑器，提供类似 PowerPoint
 ### 安装
 
 ```bash
-# 克隆项目（Gitee）
-git clone https://gitee.com/wu_fan_xin/polyeditor.git
+# 克隆项目（GitHub）
+git clone https://github.com/garlicwu/polyeditor.git
 
-# 或者从 GitHub 克隆（如果已发布）
-# git clone https://github.com/[your-username]/poly-editor.git
+# 或者从 Gitee 克隆
+# git clone https://gitee.com/wu_fan_xin/polyeditor.git
 
 # 进入项目目录
 cd polyeditor

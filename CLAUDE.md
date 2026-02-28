@@ -22,7 +22,7 @@ npx vue-tsc --noEmit # TypeScript type checking
 - simple-panzoom (canvas zoom/pan)
 - html2canvas + jspdf (PDF export)
 - vue-draggable-plus (drag & drop)
-- Node 22.14.0 (Volta)
+- Node 22.14.0 + pnpm 10.30.2 (Volta)
 - LocalStorage for data persistence (no backend required)
 
 ## Code Style
