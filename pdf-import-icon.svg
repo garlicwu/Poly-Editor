@@ -1,0 +1,18 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景圆 -->
+  <circle cx="32" cy="32" r="28" fill="#E3F2FD"/>
+
+  <!-- 文档形状 -->
+  <path d="M38 18H26C25.4696 18 24.9609 18.2107 24.5858 18.5858C24.2107 18.9609 24 19.4696 24 20V44C24 44.5304 24.2107 45.0391 24.5858 45.4142C24.9609 45.7893 25.4696 46 26 46H42C42.5304 46 43.0391 45.7893 43.4142 45.4142C43.7893 45.0391 44 44.5304 44 44V24L38 18Z"
+        fill="#2196F3" stroke="#1565C0" stroke-width="1.5"/>
+
+  <!-- 文档折角 -->
+  <path d="M38 18V24H44" stroke="#1565C0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- PDF 文字 -->
+  <text x="34" y="30" font-family="Arial, sans-serif" font-size="7" font-weight="bold" text-anchor="middle" fill="white">PDF</text>
+
+  <!-- 向下箭头（导入到系统） -->
+  <path d="M34 34V42" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M30 38L34 42L38 38" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

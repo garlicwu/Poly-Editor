@@ -123,7 +123,7 @@ const uploadAndRecognize = async () => {
     emitter.emit(MittTypeEnum.Toast_Message, {
       severity: 'success',
       summary: '成功',
-      detail: `识别完成！共 ${statistics.value.totalPages} 页，${statistics.value.totalTextBlocks} 个文本块`,
+      detail: `识别完成！共 ${statistics.value.totalPages} 页，${statistics.value.totalTextBlocks} 个文本块，${statistics.value.totalImageBlocks} 张图片`,
       life: 3000,
     })
 
@@ -247,11 +247,19 @@ defineExpose({open})
             <div class="text-2xl font-semibold">{{ statistics?.totalTextBlocks }}</div>
           </div>
           <div>
+            <div class="text-sm text-surface-600">公式数量</div>
+            <div class="text-2xl font-semibold text-purple-600">{{ statistics?.totalFormulaBlocks }}</div>
+          </div>
+          <div>
+            <div class="text-sm text-surface-600">图片数量</div>
+            <div class="text-2xl font-semibold text-blue-600">{{ statistics?.totalImageBlocks }}</div>
+          </div>
+          <div>
             <div class="text-sm text-surface-600">总字符数</div>
             <div class="text-2xl font-semibold">{{ statistics?.totalCharacters }}</div>
           </div>
           <div>
-            <div class="text-sm text-surface-600">平均每页文本块</div>
+            <div class="text-sm text-surface-600">平均每页组件</div>
             <div class="text-2xl font-semibold">{{ statistics?.averageBlocksPerPage }}</div>
           </div>
         </div>

@@ -63,12 +63,19 @@ npx vue-tsc --noEmit # TypeScript type checking
 
 ### Rich Text Editing
 - Quill 2.0.3 for text components (quill-text-view.vue)
-- Custom toolbar and formatting stored in textEdiotrSotre
+- Custom toolbar and formatting stored in textEdiotrSotre (note: typo in filename)
 - Auto-resize utility (quill-text-auto-resize-util.ts)
 - Display mode: quill-text-display-view.vue
 
-### PDF Export
-- pdf-util.ts - Export pages to PDF using html2canvas + jspdf
+### PDF Import/Export
+- **PDF Export**: pdf-util.ts - Export pages to PDF using html2canvas + jspdf
+- **PDF Import**: Integrated with Zhipu AI OCR API (glm-ocr model)
+  - Supports PDF files ≤50MB, up to 100 pages
+  - Automatically extracts text blocks with position and content
+  - Configurable default font and font size
+  - Imported pages inserted after current page
+  - API key stored in localStorage (STORAGE_KEY_PDF_ZHIPU_API_KEY)
+  - See PDF_IMPORT_GUIDE.md and PDF_IMPORT_ANALYSIS.md for details
 - Progress tracking via editorStore.pdfExportProgressValue
 - Handles multi-page documents with page breaks
 
@@ -127,17 +134,22 @@ npx vue-tsc --noEmit # TypeScript type checking
 ## Important Files
 
 - src/store/editorStore.ts - Core editor logic, canvas config, undo/redo
-- src/store/textEdiotrSotre.ts - Text editor state and formatting
+- src/store/textEdiotrSotre.ts - Text editor state and formatting (note: typo in filename)
 - src/store/useAreaMoveStore.ts - Component movement and positioning
+- src/store/useTableStateStore.ts - ag-grid table state management
+- src/store/useViewDraggerStore.ts - Drag & drop state
 - src/lib/mitt.ts - Event bus definitions
 - src/lib/pdf-util.ts - PDF export logic
-- src/lib/storage.ts - LocalStorage wrapper
-- src/view/common/drager/ - Drag/resize/rotate system
-- src/view/common/sketch-ruler/ - Canvas ruler component
+- src/lib/storage.ts - LocalStorage wrapper (LStorage class)
+- src/lib/font-face-list.ts - Font size conversion utilities (dealFontsizePt2Px)
+- src/view/common/drager/ - Custom drag/resize/rotate component system
+- src/view/common/sketch-ruler/ - Canvas ruler with snap guides
 - src/view/editor/component/ - Component renderers (text, image, table, etc.)
 - src/view/editor/component/editorComponentInit.ts - Component factory
 - src/view/editor/utils/common-modle.ts - Core type definitions (IComponentInfo, IEditorPageInfo, etc.)
 - src/view/editor/hooks/useActions.ts - Editor actions and keyboard shortcuts
+- PDF_IMPORT_GUIDE.md - PDF import feature documentation
+- PDF_IMPORT_ANALYSIS.md - Technical analysis of PDF import implementation
 
 ## Removed Features (Open Source Cleanup)
 

@@ -427,6 +427,216 @@ poly-editor/
    - Compress large images before use
    - Regularly clean up unnecessary pages
 
+## 📋 Roadmap (TODO)
+
+### 🔥 High Priority
+
+#### PDF Import Enhancements
+- [ ] **PDF Image Extraction & Display**
+  - Extract actual images from PDF using PDF.js
+  - Replace placeholders with real images
+  - Support image compression and optimization
+  - Maintain original aspect ratio
+
+- [ ] **LaTeX Formula Rendering**
+  - Integrate MathJax or KaTeX library
+  - Support visual formula rendering
+  - Keep original LaTeX code editable
+  - Support inline and display formulas
+
+- [ ] **HTML Format Preservation**
+  - Complete HTML to Quill DeltaOps conversion
+  - Preserve bold, italic, underline, colors, etc.
+  - Support lists, links, and complex formats
+  - Optimize conversion accuracy
+
+- [ ] **PDF Table Recognition**
+  - Recognize table structure in PDF
+  - Auto-create ag-grid table components
+  - Preserve table styles and data
+  - Support merged cells
+
+### 🎨 Core Editor Features
+
+- [ ] **Image Editing Enhancement**
+  - Image crop, filters, adjustments
+  - Image compression and format conversion
+  - Support modern formats like WebP
+  - Batch image processing
+
+- [ ] **Collaboration Features**
+  - Real-time collaborative editing (WebSocket)
+  - Version history and rollback
+  - Comments and annotations
+  - Permission management
+
+- [ ] **Template System**
+  - Pre-built template library
+  - Custom template saving
+  - Template categorization and search
+  - Template marketplace
+
+- [ ] **Keyboard Shortcuts Enhancement**
+  - Customizable shortcuts
+  - Shortcut conflict detection
+  - Shortcuts help panel
+  - Import/export shortcut configs
+
+### 🚀 Performance Optimization
+
+- [ ] **Virtual Scrolling**
+  - Optimize for large component scenarios
+  - Virtual list rendering
+  - Lazy loading components
+  - Memory management optimization
+
+- [ ] **Undo/Redo Optimization**
+  - Incremental storage strategy
+  - History compression
+  - Configurable history limits
+  - Large document performance
+
+- [ ] **Export Performance**
+  - PDF export progress optimization
+  - Chunked export for large documents
+  - Export queue management
+  - Background export support
+
+### 📱 Mobile Support
+
+- [ ] **Responsive Design**
+  - Mobile UI adaptation
+  - Touch gesture support
+  - Mobile toolbar
+  - PWA support
+
+- [ ] **Mobile Editing**
+  - Simplified editing mode
+  - Touch drag optimization
+  - Virtual keyboard adaptation
+  - Mobile preview
+
+### 🔌 Plugin System
+
+- [ ] **Plugin Architecture**
+  - Plugin API design
+  - Plugin lifecycle
+  - Plugin marketplace
+  - Official plugin examples
+
+- [ ] **Third-party Integrations**
+  - Google Fonts integration
+  - Unsplash image library
+  - Iconify icon library
+  - AI-assisted writing
+
+### 🌐 Internationalization
+
+- [ ] **Multi-language Support**
+  - English interface
+  - Japanese interface
+  - Other language extensions
+  - RTL language support
+
+- [ ] **Localization**
+  - Date/time formats
+  - Number formats
+  - Currency formats
+  - Timezone support
+
+### 🛠️ Developer Experience
+
+- [ ] **Documentation**
+  - API documentation
+  - Component documentation
+  - Usage examples
+  - Video tutorials
+
+- [ ] **Test Coverage**
+  - Unit tests
+  - Integration tests
+  - E2E tests
+  - Performance tests
+
+- [ ] **Development Tools**
+  - Component debug panel
+  - Performance profiler
+  - Logging system
+  - Error tracking
+
+### 💡 Innovative Features
+
+- [ ] **AI Assistance**
+  - AI auto-layout
+  - AI content generation
+  - AI image description
+  - AI smart suggestions
+
+- [ ] **Smart Alignment**
+  - ML-optimized alignment algorithms
+  - Smart grid suggestions
+  - Auto-distribution optimization
+  - Intelligent spacing adjustment
+
+- [ ] **Version Control**
+  - Git integration
+  - Diff comparison
+  - Branch management
+  - Merge conflict resolution
+
+- [ ] **Data Visualization**
+  - Chart integration (ECharts/Chart.js)
+  - Data source binding
+  - Real-time data updates
+  - Interactive charts
+
+### 🔐 Security & Privacy
+
+- [ ] **Data Encryption**
+  - Local data encryption
+  - Export file encryption
+  - Password protection
+  - Permission validation
+
+- [ ] **Privacy Protection**
+  - Privacy mode
+  - Sensitive info detection
+  - Watermark support
+  - Content moderation
+
+### 📦 Other Improvements
+
+- [ ] **Import Support**
+  - Word document import
+  - PowerPoint import
+  - Markdown import
+  - HTML import
+
+- [ ] **Export Enhancement**
+  - Export as images (PNG/JPG/SVG)
+  - Export as video (MP4/GIF)
+  - Batch export
+  - Custom export templates
+
+- [ ] **Cloud Storage**
+  - Alibaba Cloud OSS
+  - Tencent Cloud COS
+  - AWS S3
+  - Custom storage backend
+
+---
+
+### 🎯 How to Contribute
+
+If you're interested in any of these features:
+
+1. **Submit Issue** - Discuss feature design and implementation
+2. **Fork & PR** - Implement features and submit Pull Requests
+3. **Feedback** - Suggest new features and improvements
+4. **Testing** - Help test new features and report issues
+
+See [Contributing Guide](CONTRIBUTING.md) for more details.
+
 ## 🤝 Contributing
 
 We welcome all forms of contribution! Please see [Contributing Guide](CONTRIBUTING.md) for details.

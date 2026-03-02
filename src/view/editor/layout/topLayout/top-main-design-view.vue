@@ -68,7 +68,7 @@ const topItemList = ref<IItemTop[]>([
   },
   {
     name: '导入PDF',
-    icon: 'ic-top-design-save', // 临时使用保存图标，可以替换为导入图标
+    icon: 'ic-top-design-pdf-import',
   },
 ])
 

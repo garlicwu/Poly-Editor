@@ -154,6 +154,75 @@ function convertOCRPageToEditorPage(ocrPage: IOCRPage, pageIndex: number, projec
 }
 
 /**
+ * 清理 LaTeX 公式，提取纯文本
+ * @param content LaTeX 格式的公式
+ * @returns 纯文本内容
+ */
+function cleanLatex(content: string): string {
+  let cleaned = content
+    // 移除 $$ 包裹
+    .replace(/^\$\$\s*/g, '')
+    .replace(/\s*\$\$$/g, '')
+    // 移除行内 $ 包裹（包括单个 $ 和成对的 $）
+    .replace(/\$([^$]+)\$/g, '$1') // $content$ → content
+    .replace(/\$/g, '') // 移除剩余的单个 $
+    // 移除换行
+    .replace(/\n/g, ' ')
+    // 移除 LaTeX 命令（保留内容）
+    .replace(/\\textcircled\{([^}]*)\}/g, '($1)') // \textcircled{1} → (1)
+    .replace(/\\([a-zA-Z]+)\{([^}]*)\}/g, '$2') // \command{content} → content
+    .replace(/\\([a-zA-Z]+)/g, '') // \command → 空
+    // 移除特殊符号
+    .replace(/[{}]/g, '')
+    .replace(/_/g, ' ')
+    .replace(/\^/g, ' ')
+    // 清理多余空格
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  return cleaned || '[公式]' // 如果清理后为空，显示占位符
+}
+
+/**
+ * 检测字符串是否包含 LaTeX 公式
+ * @param content 待检测的内容
+ * @returns 是否包含 LaTeX
+ */
+function hasLatex(content: string): boolean {
+  return /\$|\\\w+\{|\\[a-zA-Z]+/.test(content)
+}
+
+/**
+ * 检测字符串是否包含 HTML 标签
+ * @param content 待检测的内容
+ * @returns 是否包含 HTML
+ */
+function isHtml(content: string): boolean {
+  return /<[^>]+>/.test(content)
+}
+
+/**
+ * 生成默认占位图片（SVG 格式）
+ * @param width 图片宽度
+ * @param height 图片高度
+ * @returns base64 编码的 SVG 图片
+ */
+function getDefaultPlaceholderImage(width: number, height: number): string {
+  const svg = `
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="${width}" height="${height}" fill="#f5f5f5" stroke="#d0d0d0" stroke-width="2"/>
+      <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-size="16" fill="#999" font-family="Arial">
+        图片占位符
+      </text>
+      <text x="50%" y="60%" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#bbb" font-family="Arial">
+        ${Math.round(width)} × ${Math.round(height)}
+      </text>
+    </svg>
+  `
+  return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`
+}
+
+/**
  * 将 OCR 响应转换为编辑器页面列表
  */
 export function convertOCRToEditorPages(ocrResponse: IOCRResponse, projectId: string, config?: Partial<IPDFImportConfig>): IEditorPageInfo[] {
@@ -170,10 +239,14 @@ export function convertOCRToEditorPages(ocrResponse: IOCRResponse, projectId: st
   const {layout_details, data_info} = ocrResponse
   const editorPages: IEditorPageInfo[] = []
 
+  // ✅ 修复: 在循环外部获取一次基准时间戳，避免 ID 冲突
+  const baseTimestamp = new Date().getTime()
+
   // 遍历每一页
   layout_details.forEach((pageBlocks, pageIndex) => {
-    const timestamp = new Date().getTime()
-    const pageId = `${projectId}P${timestamp + pageIndex * 1000}`
+    // ✅ 使用基准时间戳 + 较大的偏移量，并添加 -imported 后缀
+    const pageTimestamp = baseTimestamp + pageIndex * 10000 // 每页间隔 10 秒
+    const pageId = `${projectId}P${pageTimestamp}-imported`
 
     // 获取页面尺寸
     const pageInfo = data_info.pages[pageIndex]
@@ -195,35 +268,68 @@ export function convertOCRToEditorPages(ocrResponse: IOCRResponse, projectId: st
       pixelHeight: pixelHeight,
     }
 
-    // 转换文本块（只处理 text 类型）
+    // 转换文本块、图片、公式等
     const componentList: IComponentInfo[] = []
     let componentIndex = 0
 
     pageBlocks.forEach((block) => {
+      const [left, top, right, bottom] = block.bbox_2d
+      const width = right - left
+      const height = bottom - top
+
+      // ✅ 每个组件间隔 100ms
+      const componentTimestamp = pageTimestamp + componentIndex * 100
+      const componentId = `${pageId}C${componentTimestamp}`
+
+      // ✅ 处理文本类型
       if (block.label === 'text' && block.content) {
-        const [left, top, right, bottom] = block.bbox_2d
-        const width = right - left
-        const height = bottom - top
+        let cleanContent = block.content
+        let deltaOps: any[]
 
-        const componentTimestamp = timestamp + pageIndex * 1000 + componentIndex * 100
-        const componentId = `${pageId}C${componentTimestamp}`
-
-        const deltaOps = [
-          {
-            insert: block.content,
-          },
-          {
-            insert: '\n',
-          },
-        ]
+        // 检查是否包含 LaTeX 公式
+        if (hasLatex(block.content)) {
+          // 清理 LaTeX 公式
+          cleanContent = cleanLatex(block.content)
+          deltaOps = [
+            {
+              insert: cleanContent,
+            },
+            {
+              insert: '\n',
+            },
+          ]
+        }
+        // 检查是否包含 HTML
+        else if (isHtml(block.content)) {
+          // TODO: 实现 HTML 到 DeltaOps 的转换
+          // 暂时先移除 HTML 标签，显示纯文本
+          cleanContent = block.content.replace(/<[^>]+>/g, '')
+          deltaOps = [
+            {
+              insert: cleanContent,
+            },
+            {
+              insert: '\n',
+            },
+          ]
+        } else {
+          deltaOps = [
+            {
+              insert: block.content,
+            },
+            {
+              insert: '\n',
+            },
+          ]
+        }
 
         const component: IComponentInfo = {
           componentId: componentId,
           id: componentId,
           componentType: EComponentType.Text,
           component: './text/quill-text-view.vue',
-          text: block.content,
-          semanticHTML: `<p>${block.content}</p>`,
+          text: cleanContent,
+          semanticHTML: `<p>${cleanContent}</p>`,
           deltaOps: deltaOps,
           left: left,
           top: top,
@@ -254,6 +360,92 @@ export function convertOCRToEditorPages(ocrResponse: IOCRResponse, projectId: st
         componentList.push(component)
         componentIndex++
       }
+      // ✅ 处理公式类型（LaTeX）
+      else if (block.label === 'formula' && block.content) {
+        // 清理 LaTeX，只显示纯文本
+        const cleanContent = cleanLatex(block.content)
+
+        const deltaOps = [
+          {
+            insert: cleanContent,
+          },
+          {
+            insert: '\n',
+          },
+        ]
+
+        const component: IComponentInfo = {
+          componentId: componentId,
+          id: componentId,
+          componentType: EComponentType.Text,
+          component: './text/quill-text-view.vue',
+          text: cleanContent,
+          semanticHTML: `<p>${cleanContent}</p>`,
+          deltaOps: deltaOps,
+          left: left,
+          top: top,
+          width: width,
+          height: height,
+          angle: 0,
+          zindex: 1 + componentIndex,
+          selected: false,
+          editable: true,
+          disabled: false,
+          fontName: finalConfig.defaultFont,
+          fontSize: finalConfig.defaultFontSize,
+          textType: finalConfig.defaultTextType,
+          lang: finalConfig.defaultLang,
+          style: {
+            fontFamily: finalConfig.defaultFont,
+            fontSize: `${finalConfig.defaultFontSize}pt`,
+            color: '#666666', // 公式用灰色显示
+            textAlign: 'left',
+            fontStyle: 'italic', // 公式用斜体
+          },
+          divStyle: {
+            fontFamily: finalConfig.defaultFont,
+            fontSize: `${finalConfig.defaultFontSize}pt`,
+            color: '#666666',
+            fontStyle: 'italic',
+          },
+        }
+
+        componentList.push(component)
+        componentIndex++
+      }
+      // ✅ 处理图片类型
+      else if (block.label === 'image') {
+        // 生成占位图片
+        const placeholderImage = getDefaultPlaceholderImage(width, height)
+
+        const component: IComponentInfo = {
+          componentId: componentId,
+          id: componentId,
+          componentType: EComponentType.Image,
+          component: './image/image-view.vue',
+          imageSrc: placeholderImage,  // ✅ 修正: 使用 imageSrc 而不是 imgUrl
+          left: left,
+          top: top,
+          width: width,
+          height: height,
+          angle: 0,
+          zindex: 1 + componentIndex,
+          selected: false,
+          editable: true,
+          disabled: false,
+          // 图片特有属性
+          originalWidth: width,
+          originalHeight: height,
+          flipX: false,
+          flipY: false,
+          opacity: 1,
+          deltaOps: [],  // 图片组件也需要 deltaOps
+        }
+
+        componentList.push(component)
+        componentIndex++
+      }
+      // 其他类型暂时忽略（table, title 等）
     })
 
     const editorPage: IEditorPageInfo = {
@@ -309,6 +501,8 @@ export function detectPageSize(width: number, height: number): string {
 export function getOCRStatistics(ocrResponse: IOCRResponse) {
   const totalPages = ocrResponse.data_info?.num_pages || 0
   let totalTextBlocks = 0
+  let totalFormulaBlocks = 0
+  let totalImageBlocks = 0
   let totalCharacters = 0
 
   ocrResponse.layout_details?.forEach((pageBlocks) => {
@@ -316,6 +510,13 @@ export function getOCRStatistics(ocrResponse: IOCRResponse) {
       if (block.label === 'text' && block.content) {
         totalTextBlocks++
         totalCharacters += block.content.length
+      } else if (block.label === 'formula' && block.content) {
+        totalFormulaBlocks++
+        // 公式也计入字符数（使用清理后的文本）
+        const cleanContent = cleanLatex(block.content)
+        totalCharacters += cleanContent.length
+      } else if (block.label === 'image') {
+        totalImageBlocks++
       }
     })
   })
@@ -323,7 +524,9 @@ export function getOCRStatistics(ocrResponse: IOCRResponse) {
   return {
     totalPages,
     totalTextBlocks,
+    totalFormulaBlocks,
+    totalImageBlocks,
     totalCharacters,
-    averageBlocksPerPage: totalPages > 0 ? Math.round(totalTextBlocks / totalPages) : 0,
+    averageBlocksPerPage: totalPages > 0 ? Math.round((totalTextBlocks + totalFormulaBlocks + totalImageBlocks) / totalPages) : 0,
   }
 }
