@@ -1825,6 +1825,43 @@ export const useEditorStore = defineStore('editor', () => {
     _editorInfo.value.autoSaveTiming = newValue
   }
 
+  /**
+   * 添加新页面（用于 PDF 导入等场景）
+   * @param pageInfo 页面信息
+   */
+  function addNewPage(pageInfo: IEditorPageInfo) {
+    // 确保页面 ID 唯一
+    if (!pageInfo.pageId || !pageInfo.id) {
+      const timestamp = new Date().getTime()
+      pageInfo.pageId = editorInfo.value.id + 'P' + timestamp
+      pageInfo.id = pageInfo.pageId
+    }
+
+    // 确保组件 ID 唯一
+    let componentTimestamp = new Date().getTime()
+    pageInfo.componentList.forEach((component) => {
+      if (!component.componentId || !component.id) {
+        componentTimestamp += 100
+        component.componentId = pageInfo.pageId + 'C' + componentTimestamp
+        component.id = component.componentId
+      }
+    })
+
+    // 添加页面
+    _editorInfo.value.pageList.push(pageInfo)
+
+    // 刷新页面配置
+    if (pageInfo.pageSize) {
+      refreshPostInfo(pageInfo.pageSize)
+    }
+
+    // 配置页脚
+    configAllPageFooter()
+
+    // 选中新添加的页面
+    selectCurrentPage(_editorInfo.value.pageList.length - 1)
+  }
+
   return {
     editorInfo,
     addNewComponent,
@@ -1916,5 +1953,6 @@ export const useEditorStore = defineStore('editor', () => {
     updateCurrentTable,
     setAutoSaveTiming,
     hasSelectedComponent,
+    addNewPage,
   }
 })

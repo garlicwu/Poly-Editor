@@ -19,6 +19,7 @@ import {download} from 'downloadts'
 import router from '@/router'
 import {useTranslation} from '@/view/editor/hooks/useTranslation'
 import {useToast} from 'primevue/usetoast'
+import PdfImportDialog from './pdf-import-dialog.vue'
 
 interface IItemTop {
   name: string
@@ -65,9 +66,15 @@ const topItemList = ref<IItemTop[]>([
     name: '保存',
     icon: 'ic-top-design-save',
   },
+  {
+    name: '导入PDF',
+    icon: 'ic-top-design-save', // 临时使用保存图标，可以替换为导入图标
+  },
 ])
 
 const {imageUrl} = useImage()
+const pdfImportDialogRef = ref()
+
 const clickItem = async (event: Event, item: IItemTop) => {
   switch (item.name) {
     case '保存':
@@ -75,6 +82,12 @@ const clickItem = async (event: Event, item: IItemTop) => {
         break
       }
       $emit('save')
+      break
+    case '导入PDF':
+      if (disableEdit.value) {
+        break
+      }
+      pdfImportDialogRef.value?.open()
       break
   }
 }
@@ -544,11 +557,14 @@ const handleUpload = (e: Event) => {
       v-for="(item, index) in topItemList"
       :key="item.name + '_' + index"
       class="mx-2 w-12 h-12 flex items-center justify-center rounded-lg"
-      :class="disableEdit && '保存' === item.name ? 'bg-ppt-btn-bg cursor-not-allowed' : ' cursor-pointer hover:bg-ppt-bg-purple/30 transition-all duration-200 transform hover:scale-105'"
+      :class="disableEdit && ['保存', '导入PDF'].includes(item.name) ? 'bg-ppt-btn-bg cursor-not-allowed' : ' cursor-pointer hover:bg-ppt-bg-purple/30 transition-all duration-200 transform hover:scale-105'"
       :title="item.name"
       @click="clickItem($event, item)">
       <img :src="imageUrl(item.icon)" alt="" class="w-6 h-6" />
     </div>
+
+    <!-- PDF 导入对话框 -->
+    <PdfImportDialog ref="pdfImportDialogRef" />
   </div>
 </template>
 

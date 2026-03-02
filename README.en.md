@@ -33,6 +33,7 @@ Poly Editor is a fully-featured visual editor that provides a PowerPoint-like ed
 - **Precise Layout Control**: Professional layout tools including rulers, grids, snap alignment, and guides
 - **Powerful Table Features**: Integrated ag-grid for complex table editing and data display
 - **Complete Editing Operations**: Drag, scale, rotate, flip, layer management, grouping, undo/redo, and more
+- **PDF Import**: Import PDF files with automatic text recognition (powered by Zhipu AI OCR)
 - **Local Storage**: All data saved in browser localStorage, no backend server required, protecting data privacy
 - **Data Export**: Export to JSON format and PDF documents
 
@@ -49,6 +50,33 @@ The full version adds to the open-source version:
 - Advanced layout features
 
 Try the full version and support the open-source project!
+
+## 🎉 Latest Updates
+
+### v1.1.0 (2026-03-02)
+
+**New Features**
+- ✨ **PDF Import**: Import PDF files with automatic text recognition
+  - Integrated Zhipu AI OCR API for document parsing
+  - Automatically extract text blocks with position and content
+  - Support multi-page PDF documents
+  - Configurable default font and size
+  - Imported pages automatically inserted after current page
+
+**How to Use**
+1. Click "Import PDF" button in the top toolbar
+2. Enter Zhipu AI API Key (required for first use)
+3. Select PDF file (≤50MB, max 100 pages)
+4. Wait for OCR recognition to complete
+5. Adjust import settings (optional)
+6. Click "Import" button
+
+**Technical Details**
+- Uses Zhipu AI glm-ocr model for document parsing
+- Supported format: PDF
+- File size limit: ≤50MB
+- Page limit: Max 100 pages
+- API Documentation: [Zhipu AI OCR Service](https://docs.bigmodel.cn/api-reference/%E5%B7%A5%E5%85%B7-api/ocr-%E6%9C%8D%E5%8A%A1)
 
 ### Contact Us
 
@@ -81,6 +109,7 @@ Feel free to reach out with any questions, suggestions, or collaboration opportu
 - 💾 **Local Storage** - Data saved in browser localStorage, no backend required
 - 📤 **JSON Export** - Export complete editing data as JSON
 - 📥 **Data Import** - Import previously exported JSON data
+- 📄 **PDF Import** - Import PDF files with automatic text recognition (Zhipu AI OCR)
 - 📑 **PDF Export** - Export pages as PDF documents
 
 ## 🚀 Quick Start

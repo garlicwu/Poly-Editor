@@ -55,9 +55,11 @@ npx vue-tsc --noEmit # TypeScript type checking
 
 ### Component System
 - EditorComponent (src/view/editor/component/editorComponentInit.ts) - Component factory
-- Component types: Text (Quill), Image, Shape, Table (ag-grid), SVG
+- Component types defined in EComponentType enum: Text, Image, Icon, Shape, Table, SVG, Group
 - Each component has unique ID: pageId + 'C' + timestamp
 - Components rendered in area-view.vue with drager wrapper
+- All components extend IComponentInfo interface with common properties:
+  - componentId, componentType, left, top, width, height, rotate, selected, zIndex, lock
 
 ### Rich Text Editing
 - Quill 2.0.3 for text components (quill-text-view.vue)
@@ -85,14 +87,34 @@ npx vue-tsc --noEmit # TypeScript type checking
 - LStorage wrapper for localStorage (`@/lib/storage`)
 - Font size conversion: pt ↔ px (dealFontsizePt2Px)
 
+### Keyboard Shortcuts (src/view/editor/hooks/useActions.ts)
+- Ctrl+X: Cut component
+- Ctrl+C: Copy component
+- Ctrl+V: Paste component
+- Ctrl+A: Select all components
+- Ctrl+D: Duplicate component
+- Ctrl+Z: Undo
+- Ctrl+Y: Redo
+- Delete: Remove component
+- Ctrl+Shift+E: Toggle mark lines
+- Ctrl+Shift+Y: Delete all mark lines
+- Ctrl+Shift+U: Delete current page mark lines
+
+### Layout Structure (src/view/editor/layout/)
+- topLayout/ - Top toolbar with editing tools and controls
+- leftLayout/ - Left sidebar with page preview and component library
+- centerLayout/ - Main canvas area with ruler and components
+
 ## Build Configuration
 
-- Base path: `/poly`
+- Base path: `/` (root)
 - Output directory: `main/`
+- Dev server port: 8081
 - Target: ES2015 with legacy plugin
 - Console logs removed in production
 - Vendor chunks split by node_modules
 - SVG icons injected from src/assets/svg/
+- Auto-import: PrimeVue components via unplugin-vue-components
 
 ## Naming Conventions
 
@@ -105,13 +127,17 @@ npx vue-tsc --noEmit # TypeScript type checking
 ## Important Files
 
 - src/store/editorStore.ts - Core editor logic, canvas config, undo/redo
+- src/store/textEdiotrSotre.ts - Text editor state and formatting
+- src/store/useAreaMoveStore.ts - Component movement and positioning
 - src/lib/mitt.ts - Event bus definitions
 - src/lib/pdf-util.ts - PDF export logic
 - src/lib/storage.ts - LocalStorage wrapper
 - src/view/common/drager/ - Drag/resize/rotate system
 - src/view/common/sketch-ruler/ - Canvas ruler component
 - src/view/editor/component/ - Component renderers (text, image, table, etc.)
-- src/types/ - TypeScript type definitions
+- src/view/editor/component/editorComponentInit.ts - Component factory
+- src/view/editor/utils/common-modle.ts - Core type definitions (IComponentInfo, IEditorPageInfo, etc.)
+- src/view/editor/hooks/useActions.ts - Editor actions and keyboard shortcuts
 
 ## Removed Features (Open Source Cleanup)
 
@@ -126,3 +152,13 @@ The following features have been removed to prepare for open source release:
 - Export/import buttons (kept JSON save functionality)
 - Help system
 - Editor comparison functionality
+
+## Project Information
+
+- License: MIT
+- Repository: https://github.com/garlicwu/polyeditor
+- Mirror: https://gitee.com/wu_fan_xin/polyeditor
+- Demo: http://demo.jhu-ai.com/
+- Derived from: PolyPrint Studio (commercial product with translation features)
+- Documentation: See README.md and README.en.md for detailed usage instructions
+
