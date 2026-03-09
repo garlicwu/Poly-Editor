@@ -18,7 +18,7 @@ defineProps({})
 
 const editorStore = useEditorStore()
 const editorTranslationStore = useEditorTranslationStore()
-const {post, panzoomOption, autoTextResize, refreshCenterLayoutStatus, scaleByUser, cpuScale, currentPage, editorLang, hasSelectedComponent} = storeToRefs(editorStore)
+const {post, panzoomOption, autoTextResize, refreshCenterLayoutStatus, scaleByUser, cpuScale, currentPage, editorLang, hasSelectedComponent, isTextComponent} = storeToRefs(editorStore)
 const {currentTranslationPage, editorTranslationInfo} = storeToRefs(editorTranslationStore)
 const initCanvas = ref(false)
 const dragViewKey = ref(0)
@@ -250,29 +250,22 @@ const deleteLine = (lineInfo: any) => {
 const onEditorMouseDown = (e: MouseEvent) => {
   dragListViewRef.value.onEditorMouseDown(e)
 }
-
-
 </script>
 
 <template>
   <div class="flex relative">
     <div id="center-wrapper" class="relative w-full h-full bg-zinc-100 overflow-auto wrapper">
       <!-- 悬浮文字操作栏 -->
-      <div 
-        v-show="hasSelectedComponent"
+      <div
+        v-show="isTextComponent"
         ref="textToolbarRef"
         class="absolute z-20 bg-white rounded-lg shadow-md border border-ppt-line transition-all duration-300 max-w-[calc(100%-40px)] overflow-x-auto"
-        style="
-          left: 50%;
-          top: 20px;
-          transform: translateX(-50%);
-        "
-      >
+        style="left: 50%; top: 20px; transform: translateX(-50%)">
         <div class="p-2 min-w-max">
           <top-text-design-view />
         </div>
       </div>
-      
+
       <SketchRulerView
         v-if="initCanvas"
         ref="sketchruleRef"
@@ -286,7 +279,7 @@ const onEditorMouseDown = (e: MouseEvent) => {
         @zoomchange="zoomChange"
         @click="clickSketchRule"
         @apply-line-in-all-page="applyLineInAllPage"
-        @delete-line="delete-line">
+        @delete-line="deleteLine">
         <template #default>
           <drage-list-view :key="dragViewKey" ref="dragListViewRef" />
         </template>

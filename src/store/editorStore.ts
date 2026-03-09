@@ -145,6 +145,10 @@ export const useEditorStore = defineStore('editor', () => {
     return currentComponentList.value.some((item) => item.selected)
   })
 
+  const isTextComponent = computed(() => {
+    return currentComponentList.value.some((item) => item.selected && item.componentType === EComponentType.Text)
+  })
+
   function addNewPageInfoBySize(pageSize: IPageSize, type: string = '', pushIndex: number = -1) {
     const pageInfo: IEditorPageInfo = {
       pageSize: pageSize,
@@ -317,14 +321,14 @@ export const useEditorStore = defineStore('editor', () => {
         component.text = ''
         const displayName = addTextAction?.displayName || addTextAction?.name || '请输入'
         const isChinese = component.lang === 'cn'
-        const textMap: Record<string, { cn: string; en: string }> = {
-          '目录标题': { cn: '目录标题', en: 'TOC Title' },
-          '目录': { cn: '目录', en: 'TOC' },
-          '一级标题': { cn: '一级标题', en: 'Heading 1' },
-          '二级标题': { cn: '二级标题', en: 'Heading 2' },
-          '三级标题': { cn: '三级标题', en: 'Heading 3' },
-          '正文': { cn: '正文', en: 'Body' },
-          '备注文字': { cn: '备注文字', en: 'Caption' },
+        const textMap: Record<string, {cn: string; en: string}> = {
+          目录标题: {cn: '目录标题', en: 'TOC Title'},
+          目录: {cn: '目录', en: 'TOC'},
+          一级标题: {cn: '一级标题', en: 'Heading 1'},
+          二级标题: {cn: '二级标题', en: 'Heading 2'},
+          三级标题: {cn: '三级标题', en: 'Heading 3'},
+          正文: {cn: '正文', en: 'Body'},
+          备注文字: {cn: '备注文字', en: 'Caption'},
         }
         const displayText = textMap[displayName]?.[isChinese ? 'cn' : 'en'] || displayName
         component.deltaOps = [
@@ -995,7 +999,8 @@ export const useEditorStore = defineStore('editor', () => {
         page.componentList.forEach((component) => {
           if (component.imgUrl && (component.imgUrl.includes('via.placeholder.com') || component.imgUrl.includes('picsum.photos'))) {
             // Replace with local placeholder
-            component.imgUrl = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect width="300" height="200" fill="%23ddd"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23999"%3EImage%3C/text%3E%3C/svg%3E'
+            component.imgUrl =
+              'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect width="300" height="200" fill="%23ddd"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23999"%3EImage%3C/text%3E%3C/svg%3E'
           }
         })
       })
@@ -1085,7 +1090,7 @@ export const useEditorStore = defineStore('editor', () => {
       footerType: EFooterTypeType.Auto,
       dpi: defaultDpi,
       autoSaveTiming: 0,
-      fontList: ['Arial', 'Times New Roman', 'Courier New', 'Verdana', 'Georgia']
+      fontList: ['Arial', 'Times New Roman', 'Courier New', 'Verdana', 'Georgia'],
     }
     console.log('initEmptyEditor', JSON.parse(JSON.stringify(_editorInfo.value)))
   }
@@ -1954,5 +1959,6 @@ export const useEditorStore = defineStore('editor', () => {
     setAutoSaveTiming,
     hasSelectedComponent,
     addNewPage,
+    isTextComponent,
   }
 })

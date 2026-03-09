@@ -146,7 +146,7 @@ function hidePageSettingOp() {
 }
 
 const componentSetting = (event: Event) => {
-  opComponentSettingRef.value.toggle(event)
+  opComponentSettingRef.value?.toggle(event)
 }
 
 function hideComponentSettingOp() {
@@ -218,15 +218,9 @@ const handleReplaceAll = () => {
 
 <template>
   <div class="flex flex-row items-center space-x-3">
-    <div class="px-3 py-1.5 rounded text-sm text-ppt-text-normal hover:bg-ppt-bg-purple/30 transition-colors duration-200 cursor-pointer" @click="pageSetting">
-      页面设置
-    </div>
-    <div class="px-3 py-1.5 rounded text-sm text-ppt-text-normal hover:bg-ppt-bg-purple/30 transition-colors duration-200 cursor-pointer" @click="componentSetting">
-      组件设置
-    </div>
-    <div v-if="editorLang === 'en'" class="px-3 py-1.5 rounded text-sm text-ppt-text-normal hover:bg-ppt-bg-purple/30 transition-colors duration-200 cursor-pointer" @click="toggleSelectLanguage(true)">
-      小语种翻译
-    </div>
+    <div class="px-3 py-1.5 rounded text-sm text-ppt-text-normal hover:bg-ppt-bg-purple/30 transition-colors duration-200 cursor-pointer" @click="pageSetting">页面设置</div>
+    <div class="px-3 py-1.5 rounded text-sm text-ppt-text-normal hover:bg-ppt-bg-purple/30 transition-colors duration-200 cursor-pointer" @click="componentSetting">组件设置</div>
+    <div v-if="editorLang === 'en'" class="px-3 py-1.5 rounded text-sm text-ppt-text-normal hover:bg-ppt-bg-purple/30 transition-colors duration-200 cursor-pointer" @click="toggleSelectLanguage(true)">小语种翻译</div>
     <!--    <div class="flex flex-col ml-3 items-center">-->
     <!--      <div class="flex flex-row items-center">-->
     <!--        <img :src="imageUrl('ic-top-page-text-direction')" alt="" class="w-8 h-8" />-->
@@ -234,7 +228,6 @@ const handleReplaceAll = () => {
     <!--      </div>-->
     <!--      <span class="text-ppt-text-normal mt-2 text-[0.625rem]">文字方向</span>-->
     <!--    </div>-->
-    
   </div>
   <!-- 内容替换弹窗 -->
   <Popover ref="opReplace">
@@ -254,30 +247,45 @@ const handleReplaceAll = () => {
   <Popover ref="opComponentSettingRef">
     <settings-component-view @confirm-page-size="hideComponentSettingOp" />
   </Popover>
-  <Dialog v-model:visible="translateToMultilingualVisible" modal header="选择语种" class="language-select-dialog" :style="{width: '640px'}" :show-close-icon="true" :pt="{
-    root: 'bg-white rounded-xl shadow-lg border border-gray-100',
-    header: 'px-6 py-4 border-b border-gray-100',
-    title: 'text-lg font-semibold text-gray-800',
-    content: 'px-6 py-5',
-    footer: 'px-6 py-4 border-t border-gray-100 bg-gray-50/50'
-  }">
+  <Dialog
+    v-model:visible="translateToMultilingualVisible"
+    modal
+    header="选择语种"
+    class="language-select-dialog"
+    :style="{width: '640px'}"
+    :show-close-icon="true"
+    :pt="{
+      root: 'bg-white rounded-xl shadow-lg border border-gray-100',
+      header: 'px-6 py-4 border-b border-gray-100',
+      title: 'text-lg font-semibold text-gray-800',
+      content: 'px-6 py-5',
+      footer: 'px-6 py-4 border-t border-gray-100 bg-gray-50/50',
+    }">
     <div class="picklist-wrapper">
-      <PickList v-model="LanguageList" data-key="code" :show-source-controls="false" :pt="{
-        root: 'flex gap-4',
-        sourceWrapper: 'flex-1',
-        targetWrapper: 'flex-1',
-        sourceHeader: 'px-4 py-3 bg-gray-50 rounded-t-lg border border-gray-200 border-b-0',
-        targetHeader: 'px-4 py-3 bg-purple-50/50 rounded-t-lg border border-purple-100 border-b-0',
-        sourceList: 'border border-gray-200 rounded-b-lg bg-white max-h-80 overflow-y-auto',
-        targetList: 'border border-purple-100 rounded-b-lg bg-white max-h-80 overflow-y-auto',
-        item: 'px-4 py-2.5 cursor-pointer transition-all duration-200 hover:bg-purple-50/50 rounded-md my-1 mx-2',
-        buttons: 'flex flex-col gap-2 self-center',
-        button: 'w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-purple-500 hover:border-purple-500 hover:text-white transition-all duration-200 shadow-sm'
-      }">
+      <PickList
+        v-model="LanguageList"
+        data-key="code"
+        :show-source-controls="false"
+        :pt="{
+          root: 'flex gap-4',
+          sourceWrapper: 'flex-1',
+          targetWrapper: 'flex-1',
+          sourceHeader: 'px-4 py-3 bg-gray-50 rounded-t-lg border border-gray-200 border-b-0',
+          targetHeader: 'px-4 py-3 bg-purple-50/50 rounded-t-lg border border-purple-100 border-b-0',
+          sourceList: 'border border-gray-200 rounded-b-lg bg-white max-h-80 overflow-y-auto',
+          targetList: 'border border-purple-100 rounded-b-lg bg-white max-h-80 overflow-y-auto',
+          item: 'px-4 py-2.5 cursor-pointer transition-all duration-200 hover:bg-purple-50/50 rounded-md my-1 mx-2',
+          buttons: 'flex flex-col gap-2 self-center',
+          button: 'w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-purple-500 hover:border-purple-500 hover:text-white transition-all duration-200 shadow-sm',
+        }">
         <template #sourceheader>
           <div class="flex items-center gap-2">
             <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
             </svg>
             <span class="text-sm font-medium text-gray-700">可选语种</span>
             <span class="ml-auto text-xs text-gray-400">{{ LanguageList[0].length }}</span>
