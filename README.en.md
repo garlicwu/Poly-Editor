@@ -696,6 +696,8 @@ This project uses the following excellent open-source projects:
 - [ag-grid](https://www.ag-grid.com/) - Table component
 - [Pinia](https://pinia.vuejs.org/) - Vue state management
 - [VueUse](https://vueuse.org/) - Vue Composition API utilities
+- [drager](https://github.com/vangleer/es-drager) - 基于 vue3.x + CompositionAPI + typescript + vite 的可拖拽、缩放、旋转的组件
+- [vue3-sketch-ruler](https://github.com/kakajun/vue3-sketch-ruler) - Vue3 低代码平台操作页面缩放工具
 
 Thanks to all open-source community contributors!
 

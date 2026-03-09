@@ -1031,6 +1031,8 @@ MIT 许可证是一个宽松的开源许可证，允许您：
 - [ag-grid](https://www.ag-grid.com/) - 表格组件
 - [Pinia](https://pinia.vuejs.org/) - Vue 状态管理
 - [VueUse](https://vueuse.org/) - Vue Composition API 工具集
+- [drager](https://github.com/vangleer/es-drager) - A component for draggable, resizable, and rotatable elements based on vue3.x + CompositionAPI + TypeScript + Vite.
+- [vue3-sketch-ruler](https://github.com/kakajun/vue3-sketch-ruler) - In using vue3, the zoom operation used for page presentation
 
 感谢所有开源社区的贡献者！
 
