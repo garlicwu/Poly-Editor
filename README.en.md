@@ -35,7 +35,7 @@ Poly Editor is a fully-featured visual editor that provides a PowerPoint-like ed
 - **Complete Editing Operations**: Drag, scale, rotate, flip, layer management, grouping, undo/redo, and more
 - **PDF Import**: Import PDF files with automatic text recognition (powered by Zhipu AI OCR)
 - **Local Storage**: All data saved in browser localStorage, no backend server required, protecting data privacy
-- **Data Export**: Export to JSON format and PDF documents
+- **Data Export**: Export to JSON, standard PDF, and print PDF documents
 
 Use cases: Document layout, poster design, report creation, presentations, certificate generation, form design, and more.
 
@@ -52,6 +52,28 @@ The full version adds to the open-source version:
 Try the full version and support the open-source project!
 
 ## 🎉 Latest Updates
+
+### 2026-03-31 Print PDF Export
+
+**New Features**
+- ✨ **Print PDF Export**: Added a `Print PDF` button in the top toolbar
+  - Supports 3 export switches: `Enable CMYK`, `Embed ICC`, and `Outline Text`
+  - Writes the PDF in separate layers: one background layer, one other-shapes layer, one layer per image, and one layer per text component
+  - Normal text prioritizes browser-faithful appearance, while `Outline Text` attempts true vector outlining when possible
+  - If the font cannot be downloaded, glyphs are missing, or the text structure is unsupported, export falls back to an image layer without aborting
+
+**How to Use**
+1. Click `Print PDF` in the top toolbar
+2. Enable `Enable CMYK`, `Embed ICC`, and `Outline Text` as needed
+3. Click `Export Print PDF`
+4. Wait for export to finish and download the file
+
+**Technical Details**
+- Uses `renderScale=2` by default
+- Background and other-shape layers are mainly captured with `html2canvas`
+- Text without rotation or skew prefers `dom-to-image` to reduce layout drift
+- True outline conversion is implemented with `pdf-lib + @pdf-lib/fontkit`
+- The default ICC profile is `Coated FOGRA39`
 
 ### v1.1.0 (2026-03-02)
 
@@ -110,7 +132,7 @@ Feel free to reach out with any questions, suggestions, or collaboration opportu
 - 📤 **JSON Export** - Export complete editing data as JSON
 - 📥 **Data Import** - Import previously exported JSON data
 - 📄 **PDF Import** - Import PDF files with automatic text recognition (Zhipu AI OCR)
-- 📑 **PDF Export** - Export pages as PDF documents
+- 📑 **PDF Export** - Export pages as standard PDF documents or print PDF with RGB/CMYK, ICC embedding, and outline-text fallback
 
 ## 🚀 Quick Start
 
@@ -157,6 +179,233 @@ pnpm preview
 npx vue-tsc --noEmit
 ```
 
+### Fonts and Print PDF Configuration
+
+Poly Editor's current font setup is split into 4 layers. Once these layers are clear, it becomes much easier to add fonts or debug why a text block did not get true outline conversion during print PDF export.
+
+#### 1. Font picker source
+
+File:
+
+- `public/poly/config/font-server-list.csv`
+
+Purpose:
+
+- Controls which font names appear in the editor font dropdown
+- Only decides whether users can pick a font in the editor UI
+- Entries can be system font names or remote font names
+
+Important:
+
+- Being listed here does not guarantee that the actual font file can be downloaded
+- It also does not guarantee that print PDF text outlining will work
+
+Example:
+
+```csv
+Arial
+Verdana
+Tahoma
+Trebuchet%20MS
+Microsoft%20YaHei
+```
+
+#### 2. Downloadable font file index
+
+File:
+
+- `src/assets/config/font-server-list.csv`
+
+Purpose:
+
+- This is the real index of downloadable font files
+- At runtime the editor uses this file to infer candidate font files for a selected font family
+- During true outline conversion for print PDF, the exporter also uses this file to fetch the font bytes and pass them to `fontkit`
+
+Request rule:
+
+- Actual download URL = `${VITE_FONT_URL}/${file name or relative path from font-server-list.csv}`
+
+Example:
+
+```csv
+Arial.ttf
+Arial%20Black.ttf
+Poppins-Regular.otf
+OPlusSans3-Regular.ttf
+SourceHanSans-Regular.otf
+思源黑体.ttf
+```
+
+If your `VITE_FONT_URL` is:
+
+```bash
+VITE_FONT_URL='https://your-cdn.example.com/fonts'
+```
+
+Then the real request URL for `Poppins-Regular.otf` will be:
+
+```text
+https://your-cdn.example.com/fonts/Poppins-Regular.otf
+```
+
+#### 3. Base fonts preloaded at startup
+
+File:
+
+- `src/assets/config/base-font-list.json`
+
+Purpose:
+
+- Controls which fonts are preloaded first when the editor starts
+- These are usually the most common fonts in the project and the most recommended ones for export and layout
+
+Current default example:
+
+```json
+[
+  "Poppins-Regular",
+  "Future-Circle-Regular",
+  "Arial",
+  "Arial Rounded Bold",
+  "NotoSansDevanagari-Regular",
+  "OPlusSans3-Regular",
+  "SourceHanSans-Regular",
+  "思源黑体"
+]
+```
+
+Recommendation:
+
+- Put frequently used fonts here
+- Rarely used fonts do not need to be preloaded, as long as they can still be loaded on demand
+
+#### 4. Mapping from text styles and languages to fonts
+
+Files:
+
+- `src/assets/config/lang-font-list.json`
+- `src/assets/config/font-list.json`
+
+Purpose:
+
+- Controls which fonts and font sizes are used by default for different languages and text roles
+- For example, body text, heading 1, or table text can each map to different default fonts
+
+Typical examples:
+
+- English body text defaults to `Poppins-Regular`
+- Chinese body text defaults to `思源黑体`
+- A brand template can force all titles to use its own brand font
+
+#### Environment variable
+
+Files:
+
+- `.env.development`
+- `.env.production`
+
+Key variable:
+
+```bash
+VITE_FONT_URL='https://huishi-media.oss-cn-hangzhou.aliyuncs.com/translate/font'
+```
+
+Meaning:
+
+- This is the base URL used to download remote font files
+- If this variable is empty, the editor can still use browser or system fonts for display
+- But startup remote font preload and print PDF true outline conversion will not be able to fetch font binaries
+
+#### How the current font loading works
+
+The runtime behavior is:
+
+1. `fontServerInit()` reads `public/poly/config/font-server-list.csv` to build the editor font picker list.
+2. `fontInitWithList()` receives the fonts that should be preloaded and tries to load them through `new FontFace(...)`.
+3. The actual file candidates are resolved by `resolveFontFileCandidates()` in `src/lib/util.ts`.
+4. Candidate matching depends on `src/assets/config/font-server-list.csv`, built-in font grouping rules, and alias mapping.
+5. During print PDF true outline conversion, the exporter reuses the same downloadable-font logic to fetch font bytes.
+
+So the answer to "Can we use the fonts already shown in the picker?" is:
+
+- Yes, they can be used in the editor as long as the browser can render them.
+- But for remote preload, stable print export, and especially true outline conversion, those fonts must also have downloadable font files configured.
+
+#### Font alias mapping
+
+File:
+
+- `src/lib/util.ts`
+
+Current example:
+
+```ts
+const fontFileAliasMap: Record<string, string> = {
+  Arialr: 'Arial',
+}
+```
+
+Purpose:
+
+- Handles cases where the font family used in component data does not exactly match the downloadable file name
+- Useful when legacy data, OCR import, or template data uses aliases
+
+You can extend it like this:
+
+```ts
+const fontFileAliasMap: Record<string, string> = {
+  Arialr: 'Arial',
+  BrandSans: 'BrandSans-Regular',
+}
+```
+
+#### Requirements for true outline conversion in print PDF
+
+For a text block to become real vector outlines instead of an image fallback, all of the following must be true:
+
+- The text structure must be supported by the current outline exporter
+- The font family must resolve to a downloadable font file
+- `VITE_FONT_URL` must point to a valid remote font directory
+- The remote font file must be reachable and readable
+- `fontkit` must be able to parse the font
+- The required glyphs must exist in that font
+
+If any of these steps fails, the current strategy is to log the reason and fall back to an image layer, so export still succeeds.
+
+#### How to add a new font that supports editor usage and true outline export
+
+1. Upload the font files to your font CDN or object storage.
+2. Set `VITE_FONT_URL` to the parent directory of those files.
+3. Add the downloadable font file path to `src/assets/config/font-server-list.csv`.
+4. Add the font family name to `public/poly/config/font-server-list.csv` so users can pick it.
+5. If the display name and file name do not match, add an alias in `fontFileAliasMap`.
+6. Optionally add the font to `src/assets/config/base-font-list.json` for startup preload.
+7. Optionally update `src/assets/config/lang-font-list.json` or `src/assets/config/font-list.json` to make it the default for certain text styles.
+
+Minimal example:
+
+- CDN file: `BrandSans-Regular.ttf`
+- Picker entry: `BrandSans-Regular`
+- Optional alias: `BrandSans -> BrandSans-Regular`
+
+#### How to validate the configuration
+
+Recommended validation steps:
+
+1. Open the editor and confirm the font appears in the dropdown.
+2. Apply the font to a text component and verify the browser renders it correctly.
+3. Reload the page and confirm there are no remote font loading errors in the console.
+4. Export with "Print PDF" and enable "Outline Text".
+5. If the text still falls back to an image layer, check the debug logs in `print-pdf-export.ts` and `pdf-util.ts`.
+
+#### Recommended practice
+
+- Treat picker fonts and downloadable fonts as two separate configuration layers.
+- For fonts used in print export, always prepare real downloadable `.ttf` or `.otf` files.
+- Prefer using a small, verified base font set for templates that require stable output.
+- If a font is only for browser display and you do not need true outline conversion, it can exist only in the picker list.
+
 ## 🛠️ Tech Stack
 
 ### Core Framework
@@ -182,7 +431,7 @@ npx vue-tsc --noEmit
 - **Lodash** - JavaScript utility library
 - **Axios** - HTTP client
 - **Moment.js** - Date and time handling
-- **html2canvas + jspdf** - PDF export functionality
+- **html2canvas + dom-to-image + jspdf + pdf-lib** - Standard PDF export plus print PDF, layer capture, ICC, and outline support
 - **@vueuse/core** - Vue Composition API utilities
 
 ## 📁 Project Structure
@@ -193,10 +442,11 @@ poly-editor/
 │   ├── assets/              # Static resources
 │   │   ├── svg/            # SVG icons
 │   │   └── images/         # Image resources
+│   ├── export/             # Print PDF export pipeline and hidden render views
 │   ├── lib/                # Utilities and configuration
 │   │   ├── mitt.ts         # Event bus
 │   │   ├── storage.ts      # localStorage wrapper
-│   │   ├── pdf-util.ts     # PDF export utility
+│   │   ├── pdf-util.ts     # Shared PDF helpers, image/font loaders
 │   │   └── mockData.ts     # Mock data
 │   ├── net/                # Network requests (retained but no backend dependency)
 │   ├── router/             # Router configuration
@@ -352,8 +602,11 @@ poly-editor/
 - **Data Recovery**: Restore from backup
 
 #### PDF Export
-- Export all pages as PDF document
-- Custom PDF size and quality
+- Export all pages as a standard PDF document
+- Support print PDF export with RGB or CMYK image pipeline
+- The top toolbar provides a `Print PDF` entry with `CMYK / ICC / Outline Text` switches
+- Optional ICC OutputIntent embedding for print workflows
+- Optional true outline conversion for supported text blocks, with image fallback when outlining is not possible
 - Export progress display
 
 ## 📝 Usage
@@ -385,6 +638,28 @@ poly-editor/
    - Click "Save" button at top
    - Data auto-saved to browser locally
    - Export dialog appears with option to copy or download JSON
+
+### Print PDF Export
+
+1. **Open the export panel**
+   - Click the `Print PDF` button on the right side of the top toolbar
+   - Click `Export Print PDF` in the popover
+
+2. **Configure export options**
+   - `Enable CMYK`: writes the PDF through the CMYK image pipeline; if disabled, export uses RGB
+   - `Embed ICC`: available only when CMYK is enabled; embeds the default ICC profile as PDF OutputIntent
+   - `Outline Text`: attempts true outline conversion for supported text; falls back to an image layer on failure
+
+3. **Current export strategy**
+   - Background, shapes, images, and text are written into separate PDF layers
+   - Background and other-shape layers are mainly captured with `html2canvas`
+   - Text without rotation or skew prefers `dom-to-image`
+   - The default export scale is `renderScale=2`
+
+4. **Font notes**
+   - If you need true outline conversion, also read the "Fonts and Print PDF Configuration" section above
+   - Text is converted to vector paths only when the font is downloadable, the glyphs exist, and the text structure is supported
+   - Otherwise debug logs are recorded and the exporter falls back to an image layer automatically
 
 ### Keyboard Shortcuts
 

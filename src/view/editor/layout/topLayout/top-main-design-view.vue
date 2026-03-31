@@ -19,6 +19,7 @@ import {download} from 'downloadts'
 import router from '@/router'
 import {useTranslation} from '@/view/editor/hooks/useTranslation'
 import {useToast} from 'primevue/usetoast'
+import {exportPrintPdfCmyk} from '@/export/print-pdf-export'
 import PdfImportDialog from './pdf-import-dialog.vue'
 
 interface IItemTop {
@@ -39,6 +40,9 @@ const $emit = defineEmits(['save'])
 const fileBtn = ref()
 const fileInputKey = ref(0)
 const opExportShow = ref()
+const printExportUseCmyk = ref(true)
+const printExportEmbedIcc = ref(false)
+const printExportOutlineText = ref(false)
 
 const exportDes = computed(() => {
   let name = '母版导出'
@@ -75,6 +79,12 @@ const topItemList = ref<IItemTop[]>([
 const {imageUrl} = useImage()
 const pdfImportDialogRef = ref()
 
+watch(printExportUseCmyk, (value) => {
+  if (!value) {
+    printExportEmbedIcc.value = false
+  }
+})
+
 const clickItem = async (event: Event, item: IItemTop) => {
   switch (item.name) {
     case '保存':
@@ -90,6 +100,13 @@ const clickItem = async (event: Event, item: IItemTop) => {
       pdfImportDialogRef.value?.open()
       break
   }
+}
+
+const openExportPopover = (event: Event) => {
+  if (disableEdit.value) {
+    return
+  }
+  opExportShow.value?.toggle(event)
 }
 
 // 跳转到新手指导页面
@@ -218,6 +235,39 @@ const exportMasterPDfImageWithNet = async () => {
       editorStore.setLoadingText('')
       editorStore.setLoading(false)
     })
+}
+
+const exportMasterPrintPdfCmyk = async () => {
+  opExportShow.value?.hide()
+  editorStore.setLoading(true)
+  editorStore.setLoadingText('印刷PDF导出中...')
+
+  try {
+    await exportPrintPdfCmyk(editorInfo.value, useTextEditorStore().allFontMap, {
+      fileName: projectInfo.value?.name && projectInfo.value.name !== '' ? projectInfo.value.name : '未命名文件',
+      renderScale: 2,
+      colorMode: printExportUseCmyk.value ? 'cmyk' : 'rgb',
+      embedOutputIntent: printExportUseCmyk.value && printExportEmbedIcc.value,
+      outlineText: printExportOutlineText.value,
+    })
+    emitter.emit(MittTypeEnum.Toast_Message, {
+      severity: 'success',
+      summary: '成功',
+      detail: '印刷PDF导出完成',
+      life: 1500,
+    })
+  } catch (error) {
+    console.error(error)
+    emitter.emit(MittTypeEnum.Toast_Message, {
+      severity: 'error',
+      summary: '错误',
+      detail: '印刷PDF导出失败，请稍后重试',
+      life: 2000,
+    })
+  } finally {
+    editorStore.setLoadingText('')
+    editorStore.setLoading(false)
+  }
 }
 
 const exportMaster = async () => {
@@ -562,6 +612,29 @@ const handleUpload = (e: Event) => {
       @click="clickItem($event, item)">
       <img :src="imageUrl(item.icon)" alt="" class="w-6 h-6" />
     </div>
+
+    <Button type="button" label="印刷PDF" icon="pi pi-print" severity="secondary" size="small" class="ml-2" :disabled="disableEdit" @click="openExportPopover" />
+    <Popover ref="opExportShow">
+      <div class="p-4 w-64 flex flex-col gap-3">
+        <Button label="导出印刷PDF" size="small" @click="exportMasterPrintPdfCmyk" />
+        <div class="rounded border border-slate-200 p-3 flex flex-col gap-2">
+          <div class="flex items-center">
+            <Checkbox id="printExportUseCmyk" v-model="printExportUseCmyk" :binary="true" />
+            <label for="printExportUseCmyk" class="ml-2 text-sm cursor-pointer">启用 CMYK</label>
+          </div>
+          <div class="flex items-center">
+            <Checkbox id="printExportEmbedIcc" v-model="printExportEmbedIcc" :binary="true" :disabled="!printExportUseCmyk" />
+            <label for="printExportEmbedIcc" class="ml-2 text-sm cursor-pointer" :class="!printExportUseCmyk ? 'text-slate-400' : ''">嵌入 ICC</label>
+          </div>
+          <div class="flex items-center">
+            <Checkbox id="printExportOutlineText" v-model="printExportOutlineText" :binary="true" />
+            <label for="printExportOutlineText" class="ml-2 text-sm cursor-pointer">文字转曲</label>
+          </div>
+        </div>
+        <label class="text-sm text-slate-600">背景、图形、图片、文本会按独立图层写入 PDF，优先保证浏览器视觉一致性。</label>
+        <label class="text-sm text-slate-500">如果当前字体没有可下载字节，文字转曲会自动回退为图像层，不会中断导出。</label>
+      </div>
+    </Popover>
 
     <!-- PDF 导入对话框 -->
     <PdfImportDialog ref="pdfImportDialogRef" />

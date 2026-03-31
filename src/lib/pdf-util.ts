@@ -2,10 +2,10 @@ import {EComponentType, type IComponentInfo, type IEditorInfo, type IEditorPageI
 import jsPDF, {type HTMLFontFace} from 'jspdf'
 import {type FontSizeInfoType} from '@/store/textEdiotrSotre'
 import axios from 'axios'
-import util, {fontFaceNameListWithFileSuffix} from '@/lib/util'
+import util, {fontFaceNameListWithFileSuffix, isOverThreshold, resolveFontFileCandidates} from '@/lib/util'
 import {cloneDeep} from 'lodash'
 import domToImage from 'dom-to-image'
-import {createVNode, render, type VNode} from 'vue'
+import {createVNode, nextTick, render, type VNode} from 'vue'
 import PreviewChildView from '@/view/editor/layout/leftLayout/preview-list/preview-child-view.vue'
 import {useEditorStore} from '@/store/editorStore'
 import html2canvas from 'html2canvas'
@@ -13,6 +13,57 @@ import html2canvas from 'html2canvas'
 export const fontFaceList: HTMLFontFace[] = []
 export const pdfAdjustDpi = 10
 export const hasLoadFontList: string[] = []
+export const basicPdfExportRenderScale = 2
+
+const base64ResourceCache = new Map<string, Promise<string>>()
+let exportRenderHost: HTMLElement | null = null
+
+function getExportRenderHost() {
+  if (exportRenderHost && document.body.contains(exportRenderHost)) {
+    return exportRenderHost
+  }
+
+  exportRenderHost = document.createElement('div')
+  exportRenderHost.id = 'pdf-export-render-host'
+  exportRenderHost.style.position = 'absolute'
+  exportRenderHost.style.left = '-100000px'
+  exportRenderHost.style.top = '0'
+  exportRenderHost.style.width = '0'
+  exportRenderHost.style.height = '0'
+  exportRenderHost.style.overflow = 'hidden'
+  exportRenderHost.style.pointerEvents = 'none'
+  exportRenderHost.style.zIndex = '-1'
+  document.body.appendChild(exportRenderHost)
+
+  return exportRenderHost
+}
+
+function removeExportRenderNode(node?: HTMLElement | null) {
+  if (!node) {
+    return
+  }
+
+  render(null, node)
+  node.remove()
+}
+
+function waitForAnimationFrame() {
+  return new Promise<void>((resolve) => {
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => resolve())
+      return
+    }
+
+    setTimeout(() => resolve(), 16)
+  })
+}
+
+async function waitForRenderFrames(frameCount: number = 2) {
+  await nextTick()
+  for (let i = 0; i < frameCount; i++) {
+    await waitForAnimationFrame()
+  }
+}
 
 export async function getHtmlToImage(page: IEditorPageInfo, editorFontList: string[], lang: string, allFontMap: Record<string, Record<string, FontSizeInfoType>>) {
   let fontList: string[] = editorFontList ?? []
@@ -225,7 +276,7 @@ async function addText(text: IComponentInfo, pdf: jsPDF, fontInfo: FontSizeInfoT
   const {left, top} = customElement.style
   customElement.style.transform = ''
   await sleep(300)
-  const domImageData = await domToImageHelper(customElement, text.width, text.height)
+  const domImageData = await domToImageHelper(customElement, text.width, text.height, basicPdfExportRenderScale)
   if (domImageData) {
     pdf.addImage(
       domImageData,
@@ -308,7 +359,7 @@ async function addComponentWithRender(text: IComponentInfo, pdf: jsPDF, fontInfo
   await sleep(300)
   // const customElement = document.getElementById('previewChildId-pdf-' + component.componentId) as HTMLElement
   if (appendChild.firstElementChild) {
-    const domImageData = await domToImageHelper(appendChild.firstElementChild as HTMLElement, component.width, component.height)
+    const domImageData = await domToImageHelper(appendChild.firstElementChild as HTMLElement, component.width, component.height, basicPdfExportRenderScale)
     // console.log(component.componentId, domImageData)
     document.body.removeChild(appendChild)
     if (domImageData) {
@@ -326,14 +377,22 @@ async function addComponentWithRender(text: IComponentInfo, pdf: jsPDF, fontInfo
   }
 }
 
-function domToImageHelper(element: HTMLElement, width: number, height: number): Promise<string | null> {
+function domToImageHelper(element: HTMLElement, width: number, height: number, renderScale: number = 1): Promise<string | null> {
+  const exportWidth = Math.max(1, Math.round(width * renderScale))
+  const exportHeight = Math.max(1, Math.round(height * renderScale))
+
   return new Promise((resolve, reject) => {
     domToImage
       .toPng(element, {
-        quality: 4,
         bgcolor: 'transparent',
-        width: width,
-        height: height,
+        width: exportWidth,
+        height: exportHeight,
+        style: {
+          width: `${width}px`,
+          height: `${height}px`,
+          transform: `scale(${renderScale})`,
+          transformOrigin: 'top left',
+        },
       })
       .then((res) => {
         // console.log(res)
@@ -437,31 +496,62 @@ async function loadFontWithBuffer(fontList: string[], pdf: jsPDF) {
   }
 }
 
-async function loadFontWithBufferSingle(font: string) {
-  return new Promise((resolve, reject) => {
-    const realFileName = fontFaceNameListWithFileSuffix.find((itemSuffix) => itemSuffix.includes(encodeURIComponent(font) + '.'))
-    if (realFileName) {
-      const url = `${util.fontUrl}/${realFileName}`
-      getBase64FromUrl(url)
-        .then((myFont) => {
-          if (myFont && myFont.length > 0) {
-            // 将字体添加到 jsPDF
-            // myFont = myFont.replace('data:font/ttf;base64,', '')
-            // myFont = myFont.substring(myFont.indexOf('base64,') + 7)
-            resolve(myFont)
-          } else {
-            reject('<UNK>')
-          }
-        })
-        .catch((e) => reject(e))
-    } else {
-      resolve(null)
+export async function loadFontWithBufferSingle(font: string, debugContext?: string) {
+  if (!util.fontUrl) {
+    if (debugContext) {
+      console.info(`[${debugContext}] skip remote font fetch for ${font}: VITE_FONT_URL is empty`)
     }
-  })
-}
+    return null
+  }
 
-function getBase64FromUrl(url: string): Promise<string> {
-  return new Promise((resolve, reject) => {
+  const candidateFiles = resolveFontFileCandidates(font)
+  const failedRequests: string[] = []
+
+  if (candidateFiles.length === 0) {
+    if (debugContext) {
+      console.warn(`[${debugContext}] no candidate font files for ${font}`)
+    }
+    return null
+  }
+
+  for (const candidateFile of candidateFiles) {
+    const url = `${util.fontUrl}/${candidateFile}`
+    try {
+      const myFont = await getBase64FromUrl(url)
+      if (myFont && myFont.length > 0) {
+        if (debugContext) {
+          console.info(`[${debugContext}] loaded font bytes for ${font} from ${url}`)
+        }
+        return myFont
+      }
+
+      failedRequests.push(`${url} (empty response)`)
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      failedRequests.push(`${url} (${errorMessage})`)
+    }
+  }
+
+  if (debugContext) {
+    console.warn(`[${debugContext}] failed to fetch font bytes for ${font}`, {
+      candidateFiles,
+      failedRequests,
+    })
+  }
+
+  return null
+}
+export function getBase64FromUrl(url: string): Promise<string> {
+  if (!url || url.startsWith('data:')) {
+    return Promise.resolve(url)
+  }
+
+  const cacheValue = base64ResourceCache.get(url)
+  if (cacheValue) {
+    return cacheValue
+  }
+
+  const request = new Promise<string>((resolve, reject) => {
     axios
       .get(url, {responseType: 'blob'})
       .then((response) => {
@@ -471,11 +561,20 @@ function getBase64FromUrl(url: string): Promise<string> {
           const imageData = (reader.result ?? '').toString()
           resolve(imageData)
         }
+        reader.onerror = function () {
+          reject(reader.error)
+        }
       })
       .catch((error) => {
         reject(error)
       })
+  }).catch((error) => {
+    base64ResourceCache.delete(url)
+    return Promise.reject(error)
   })
+
+  base64ResourceCache.set(url, request)
+  return request
 }
 
 export function sleep(ms: number) {
@@ -483,22 +582,30 @@ export function sleep(ms: number) {
 }
 
 export async function loadFontListWithBuffer(fontList: string[]) {
+  if (!util.fontUrl) {
+    return ''
+  }
+
   // console.log('fontFaceList', fontFaceList)
   for (const font of fontList) {
-    if (font && font !== '' && fontFaceList.findIndex((item) => item.family === font) < 0) {
-      const realFileName = fontFaceNameListWithFileSuffix.find((itemSuffix) => itemSuffix.includes(encodeURIComponent(font) + '.'))
-      if (realFileName) {
-        fontFaceList.push({
-          family: font,
-          weight: 'normal',
-          src: [{url: `${util.fontUrl}/${realFileName}`, format: 'truetype'}],
-        })
-      } else {
-        break
-      }
-    } else {
-      break
+    if (!font || font === '') {
+      continue
     }
+
+    if (fontFaceList.findIndex((item) => item.family === font) > -1) {
+      continue
+    }
+
+    const realFileName = fontFaceNameListWithFileSuffix.find((itemSuffix) => itemSuffix.includes(encodeURIComponent(font) + '.'))
+    if (!realFileName) {
+      continue
+    }
+
+    fontFaceList.push({
+      family: font,
+      weight: 'normal',
+      src: [{url: `${util.fontUrl}/${realFileName}`, format: 'truetype'}],
+    })
   }
   return ''
 }
@@ -506,149 +613,133 @@ export async function loadFontListWithBuffer(fontList: string[]) {
 export async function loadFontListWithBufferInStyleSheets(fontList: string[]) {
   // console.log('fontFaceList', fontFaceList)
   for (const font of fontList) {
-    if (!hasLoadFontList.includes(font) && document.styleSheets.length > 0) {
-      const fontString = await loadFontWithBufferSingle(font)
-      if (fontString) {
-        const fontCss = `@font-face {
+    if (!font || hasLoadFontList.includes(font) || document.styleSheets.length === 0) {
+      continue
+    }
+
+    const fontString = await loadFontWithBufferSingle(font)
+    if (!fontString) {
+      continue
+    }
+
+    const fontCss = `@font-face {
               font-family: ${font};
               src: url(${fontString}) format('truetype');
               }`
-        hasLoadFontList.push(font)
-        console.log('hasLoadFontList', font)
-        document.styleSheets[document.styleSheets.length - 1].insertRule(fontCss)
-      } else {
-        break
-      }
-    } else {
-      break
+    hasLoadFontList.push(font)
+    if (!isOverThreshold(fontString, 500 * 1024)) {
+      document.styleSheets[document.styleSheets.length - 1].insertRule(fontCss)
     }
   }
   return ''
 }
 
-export async function buildComponentWithRender(text: IComponentInfo, fontInfo?: FontSizeInfoType): Promise<string | null> {
+export async function buildComponentWithRender(text: IComponentInfo, fontInfo?: FontSizeInfoType, renderScale: number = basicPdfExportRenderScale): Promise<string | null> {
   if (!text.componentType || text.componentType === EComponentType.Image) {
     return null
   }
   const component = cloneDeep(text)
+  let appendChild: HTMLElement | null = null
   try {
-  let appendChild: any = document.createElement('div') as HTMLElement
-  let vm: VNode | null = null
-  // appendChild.classList.add('preview-pdf-container')
-  appendChild.id = 'preview-' + component.componentId
-  appendChild.style.left = '-' + component.width + 'px'
-  appendChild.style.width = component.width + 'px'
-  appendChild.style.height = component.height + 'px'
-  appendChild.style.position = 'absolute'
-  appendChild.style.color = 'black'
-  appendChild.style.background = 'transparent'
-  appendChild.style.zIndex = '10'
-  // appendChild.style.transform = `scale(${1})`
-  appendChild.style.transformOrigin = 'top left'
-  appendChild.style.overflow = 'hidden'
-  appendChild.style.scrollbarWidth = 'none' // Firefox
-  appendChild.style.msOverflowStyle = 'none' // IE/Edge
-  appendChild.style.cssText += `
+    appendChild = document.createElement('div') as HTMLElement
+    const vm: VNode = createVNode(PreviewChildView, {component: component, fontSizeInfoType: fontInfo, needTranslate: false})
+    // appendChild.classList.add('preview-pdf-container')
+    appendChild.id = 'preview-' + component.componentId
+    appendChild.style.left = '-' + component.width + 'px'
+    appendChild.style.width = component.width + 'px'
+    appendChild.style.height = component.height + 'px'
+    appendChild.style.position = 'absolute'
+    appendChild.style.color = 'black'
+    appendChild.style.background = 'transparent'
+    appendChild.style.zIndex = '10'
+    // appendChild.style.transform = `scale(${1})`
+    appendChild.style.transformOrigin = 'top left'
+    appendChild.style.overflow = 'hidden'
+    appendChild.style.scrollbarWidth = 'none' // Firefox
+    appendChild.style.msOverflowStyle = 'none' // IE/Edge
+    appendChild.style.cssText += `
     overflow: auto;
     scrollbar-width: none;
     scrollbar-height: none;
     -ms-overflow-style: none;
   `
-  // appendChild.textContent = `
-  //   #myElement::-webkit-scrollbar {
-  //     display: none;
-  //   }
-  // `
-  // allTextGenerateStyle.forEach((element) => {
-  //   appendChild.classList.add(element)
-  // })
+    // appendChild.textContent = `
+    //   #myElement::-webkit-scrollbar {
+    //     display: none;
+    //   }
+    // `
+    // allTextGenerateStyle.forEach((element) => {
+    //   appendChild.classList.add(element)
+    // })
 
-  // if (component.componentType === EComponentType.Image && component.imageSrc && component.imageSrc !== '') {
-  //   const imageBase64 = await getBase64FromUrl(component.imageSrc)
-  //   component.imageSrc = imageBase64
-  // }
-  vm = createVNode(PreviewChildView, {component: component, fontSizeInfoType: fontInfo, needTranslate: false})
-  // 将组件渲染成真实节点
-  render(vm, appendChild)
-  document.body.appendChild(appendChild)
-  await document.fonts.ready
-  await sleep(300)
-  // return ''
-  // const customElement = document.getElementById('previewChildId-pdf-' + component.componentId) as HTMLElement
-  if (appendChild.firstElementChild) {
-    let hasSpecialStyle = false
-    if (component.componentType === EComponentType.Text) {
-      let allDeltaOps: any = JSON.stringify(component.deltaOps)
-      console.log(allDeltaOps)
-      if (allDeltaOps.includes('ordered-')) {
-        hasSpecialStyle = true
-      }
-
-      allDeltaOps = null
-    }
-    let imageBase64
-    if (component.componentType === EComponentType.Table || (component.componentType === EComponentType.Text && hasSpecialStyle)) {
-      // fontList = Array.from(new Set(fontList))
-      // await loadFontListWithBufferInStyleSheets(fontList)
+    // if (component.componentType === EComponentType.Image && component.imageSrc && component.imageSrc !== '') {
+    //   const imageBase64 = await getBase64FromUrl(component.imageSrc)
+    //   component.imageSrc = imageBase64
+    // }
+    // 将组件渲染成真实节点
+    render(vm, appendChild)
+    getExportRenderHost().appendChild(appendChild)
+    await waitForRenderFrames()
+    // return ''
+    // const customElement = document.getElementById('previewChildId-pdf-' + component.componentId) as HTMLElement
+    if (appendChild.firstElementChild) {
+      let hasSpecialStyle = false
       if (component.componentType === EComponentType.Text) {
-        appendChild.style.height = component.height + 45 + 'px'
-        appendChild.style['padding-top'] = '-45px !important'
-        await sleep(100)
+        let allDeltaOps: any = JSON.stringify(component.deltaOps)
+        if (allDeltaOps.includes('ordered-')) {
+          hasSpecialStyle = true
+        }
+
+        allDeltaOps = null
       }
-      const canvas = await html2canvas(appendChild, {
-        removeContainer: true,
-        backgroundColor: 'transparent',
-        scale: 1, // 固定为1，避免缩放问题
-        useCORS: true,
-        foreignObjectRendering: false, // 关闭foreignObject可能有助于文本渲染
-      })
-      if (canvas) {
-        imageBase64 = canvas.toDataURL('image/png')
-        console.log('canvas' + component.componentId, imageBase64)
-        document.body.removeChild(appendChild)
-        appendChild = null
-        vm = null
-      } else {
+      let imageBase64
+      if (component.componentType === EComponentType.Table || (component.componentType === EComponentType.Text && hasSpecialStyle)) {
+        // fontList = Array.from(new Set(fontList))
+        // await loadFontListWithBufferInStyleSheets(fontList)
+        if (component.componentType === EComponentType.Text) {
+          appendChild.style.height = component.height + 45 + 'px'
+          appendChild.style['padding-top'] = '-45px !important'
+          await waitForRenderFrames(1)
+        }
+        const canvas = await html2canvas(appendChild, {
+          removeContainer: true,
+          backgroundColor: 'transparent',
+          scale: renderScale, // 按导出倍数做超采样
+          useCORS: true,
+          foreignObjectRendering: false, // 关闭foreignObject可能有助于文本渲染
+        })
+        if (canvas) {
+          imageBase64 = canvas.toDataURL('image/png')
+        } else {
+          const textElement = appendChild.querySelector('.ql-editor') as HTMLElement
+          if (textElement) {
+            textElement.style.overflow = 'hidden'
+          }
+          imageBase64 = await domToImageHelper(appendChild.firstElementChild as HTMLElement, component.width, component.height, renderScale)
+        }
+        return imageBase64
+      }
+
+      if (component.componentType === EComponentType.Text) {
         const textElement = appendChild.querySelector('.ql-editor') as HTMLElement
         if (textElement) {
-          console.log('textElement', textElement)
           textElement.style.overflow = 'hidden'
         }
-        imageBase64 = await domToImageHelper(appendChild.firstElementChild as HTMLElement, component.width, component.height)
-        console.log(component.componentId, imageBase64)
-        document.body.removeChild(appendChild)
-        appendChild = null
-        vm = null
       }
+      imageBase64 = await domToImageHelper(appendChild.firstElementChild as HTMLElement, component.width, component.height, renderScale)
       return imageBase64
+    } else {
+      return null
     }
-
-    if (component.componentType === EComponentType.Text) {
-      const textElement = appendChild.querySelector('.ql-editor') as HTMLElement
-      if (textElement) {
-        console.log('textElement', textElement)
-        textElement.style.overflow = 'hidden'
-      }
-    }
-    imageBase64 = await domToImageHelper(appendChild.firstElementChild as HTMLElement, component.width, component.height)
-
-    console.log(component.componentId, imageBase64)
-    document.body.removeChild(appendChild)
-    appendChild = null
-    vm = null
-    return imageBase64
-  } else {
-    appendChild = null
-    vm = null
-    return null
-  }
   } catch (error) {
     console.error('PDF导出组件渲染失败:', {
       componentId: component.componentId,
       componentType: component.componentType,
       divStyle: component.divStyle,
-      error: error
+      error: error,
     })
     return null
+  } finally {
+    removeExportRenderNode(appendChild)
   }
 }
